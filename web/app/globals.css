@@ -1,0 +1,1088 @@
+/* ============================================================
+   Слой компонентов кита — перенесён из kit/markethelp-ui-kit.html
+   как есть, вместе с пояснениями. Классы те же, поэтому вёрстка
+   макета работает без правок, а кит остаётся источником правды:
+   правим там — переносим сюда (scripts/kit-lint.mjs следит, что
+   в разметке нет переопределений китовых классов утилитами).
+   ============================================================ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+  @layer base {
+    html { font-size: 100%; }
+    /* Элемент, которому в разметке поставили hidden, обязан исчезать.
+       Браузер прячет его своим правилом, но оно слабее наших: любой
+       элемент кита, задающий display — кнопка, ссылка перехода, метка, —
+       перебивал бы hidden и оставался на виду. */
+    [hidden] { display: none !important; }
+    body { @apply bg-surface text-ink font-sans text-base leading-relaxed antialiased; }
+  }
+
+  @layer components {
+
+    /* ---------- КИТ: иконки ---------- */
+    /* Толщина линии задана в системе координат самой иконки, поэтому
+       вместе с размером растёт и штрих. Чтобы вес выглядел одинаковым,
+       у крупных иконок линия тоньше, у мелких — толще: на экране все
+       четыре размера дают штрих около полутора пикселей. */
+    .ic     { @apply w-5 h-5 shrink-0 fill-none stroke-current; stroke-width: 0.125rem; stroke-linecap: round; stroke-linejoin: round; }
+    .ic-xs  { @apply w-3.5 h-3.5; stroke-width: 0.15625rem; }
+    .ic-sm  { @apply w-4 h-4; stroke-width: 0.140625rem; }
+    .ic-lg  { @apply w-7 h-7; stroke-width: 0.09375rem; }
+    /* Иллюстративный размер — для схем и пустых состояний, где иконка
+       работает картинкой, а не значком. В строке и в кнопке не ставится. */
+    .ic-xl  { @apply w-[4.5rem] h-[4.5rem]; stroke-width: 0.05rem; }
+
+    /* ---------- ОФОРМЛЕНИЕ ВИТРИНЫ — НЕ ЧАСТЬ КИТА ----------
+       Всё в этом блоке нужно только затем, чтобы разложить кит по полкам
+       на этой странице: серый фон, белые подложки разделов, их заголовки,
+       пояснительные абзацы, образцы цвета, ячейки иконок, макеты окон
+       и переключатель внизу слева. На сайт ничего из этого не переносится.
+       Исключение — .card: это настоящий элемент кита, здесь он заодно
+       служит подложкой. -------------------------------------------------- */
+    /* .sheet — подложка витрины. Не элемент кита и не участвует
+       в переключателе: она всегда выглядит одинаково, чтобы служить
+       нейтральным фоном для того, что на ней разложено. */
+    .sheet      { @apply bg-white rounded-card p-6 border border-line; }
+
+    /* карточке нужна и линия, и тень: тень даёт высоту на сером фоне
+       страницы, линия очерчивает край, когда карточка лежит на белом */
+    .card       { @apply bg-white rounded-card p-6 border border-line shadow-e1; }
+    .card-title { @apply font-semibold text-[0.875rem] text-ink-mute mb-4; }
+    .lede       { @apply text-ink-soft max-w-[62ch] mb-5; }
+    .why        { @apply text-[0.9375rem] text-ink-soft max-w-[64ch]; }
+    .why b      { @apply text-ink; }
+
+    /* ---------- КИТ: типографика ---------- */
+    /* Display — ступень крупнее заголовков. Нужна не для того, чтобы
+       текст было лучше видно: на такой кегль смотрят, а не читают.
+       Поэтому у неё межстрочный плотнее обычного и разрядка отрицательная
+       — на большом размере буквы иначе расползаются, а строки повисают
+       далеко друг от друга. Размер плавающий, и нижняя граница взята
+       по самому длинному слову, какое встречается в заголовках, —
+       «маркетплейсом». На узком экране оно должно умещаться в строку
+       целиком: переносить его негде, и на кегле крупнее оно вылезает
+       за край. */
+    .t-display    { @apply font-extrabold text-[clamp(2.125rem,6.4vw,4.5rem)] leading-[1.02] tracking-[-0.035em]; }
+    .t-display-sm { @apply font-extrabold text-[clamp(2rem,4vw,2.875rem)] leading-[1.06] tracking-[-0.03em]; }
+
+    .t-h1    { @apply font-extrabold text-[2.75rem] leading-[1.08] tracking-[-0.02em]; }
+    .t-h2    { @apply font-bold text-[2rem] leading-[1.18] tracking-[-0.015em]; }
+    .t-h3    { @apply font-bold text-[1.375rem] leading-snug; }
+    .t-h4    { @apply font-semibold text-[1.125rem] leading-snug; }
+    .t-lead  { @apply text-[1.125rem] leading-relaxed text-ink-soft; }
+    .t-small { @apply text-sm leading-normal text-ink-soft; }
+
+    /* ---------- КИТ: кнопки ---------- */
+    .btn {
+      @apply inline-flex items-center gap-2 font-semibold text-[0.9375rem] leading-none
+             h-ctl px-[1.375rem] rounded-full border border-transparent
+             bg-brand text-white cursor-pointer
+             transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-150
+             focus-visible:outline-none focus-visible:shadow-ring
+             disabled:bg-line-soft disabled:text-ink-mute disabled:border-line disabled:cursor-not-allowed;
+    }
+    .btn .ic { @apply w-[1.15em] h-[1.15em]; }
+
+    /* Наведение и нажатие делает заливка-градиент ниже по файлу, а не эти
+       правила. Простой цвет остаётся только базовым — он виден у выключенной
+       кнопки, где градиента нет, и у тихой, где верх заливки прозрачный. */
+
+    .btn-secondary { @apply bg-white text-brand border-brand disabled:bg-white; }
+    .btn-quiet     { @apply bg-transparent text-ink-soft border-line hover:bg-surface hover:text-ink; }
+    .btn-soft      { @apply bg-surface text-ink-soft border-line-soft hover:text-ink; }
+    .btn-jade      { @apply bg-jade text-white; }
+    .btn-sun       { @apply bg-sun text-ink; }
+    .btn-danger    { @apply bg-bad; }
+
+    .btn-sm   { @apply h-ctl-sm px-4 text-[0.875rem]; }
+    .btn-lg   { @apply h-ctl-lg px-7 text-[1.0625rem]; }
+    .btn-icon { @apply w-ctl px-0 justify-center rounded-full; }
+    .btn-icon.btn-sm { @apply w-ctl-sm; }
+    .btn-icon.btn-lg { @apply w-ctl-lg; }
+
+    /* ---------- поля ---------- */
+    .field       { @apply flex flex-col gap-1.5; }
+    .field-hint  { @apply text-[0.8125rem] text-ink-mute; }
+    .field-err   { @apply flex items-start gap-1.5 text-[0.8125rem] leading-5 font-medium text-bad; }
+    .field-err .ic { @apply mt-0.5; }
+
+    .input {
+      @apply block w-full h-ctl px-3.5 rounded-input border border-line bg-white
+             text-base text-ink font-sans
+             transition-[border-color,box-shadow] duration-150
+             placeholder:text-ink-faint
+             [&:hover:not(:focus):not(:disabled)]:border-line-strong
+             focus:outline-none focus:border-brand focus:shadow-ring
+             disabled:bg-surface disabled:text-ink-mute;
+    }
+    /* У числового поля нет браузерных стрелок: они мелкие, в каждом
+       браузере свои и не попадают в наш ряд контролов. Число вводят
+       с клавиатуры; на телефоне её вызывает inputmode="numeric". */
+    .input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+    .input[type="number"]::-webkit-outer-spin-button,
+    .input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .input-sm   { @apply h-ctl-sm text-[0.9375rem]; }
+    .input-lg   { @apply h-ctl-lg text-[1.0625rem]; }
+    .input-bad  { @apply border-bad [&:hover:not(:focus):not(:disabled)]:border-bad focus:shadow-[0_0_0_0.1875rem_rgba(192,54,44,.2)]; }
+
+    textarea.input { @apply h-auto min-h-[5.5rem] py-2.5 resize-y; }
+
+    /* поле со встроенной подписью */
+    .float        { @apply relative block w-full; }
+    .float .input { @apply h-ctl-lg pt-6 pb-1.5; }
+    .float textarea.input { @apply h-auto min-h-[6rem] pt-6; }
+    .float-label {
+      @apply absolute left-3.5 top-1/2 -translate-y-1/2 origin-left pointer-events-none
+             text-base text-ink-mute transition-all duration-200
+             peer-focus:top-[0.9375rem] peer-focus:text-[0.75rem] peer-focus:font-semibold peer-focus:text-brand
+             peer-[:not(:placeholder-shown)]:top-[0.9375rem]
+             peer-[:not(:placeholder-shown)]:text-[0.75rem]
+             peer-[:not(:placeholder-shown)]:font-semibold;
+    }
+    .float-up .float-label   { @apply top-[0.9375rem] text-[0.75rem] font-semibold; }
+    /* У поля в несколько строк подпись не может стоять по середине:
+       середина у него уезжает вниз вместе с высотой. Раньше это включал
+       отдельный класс, и его легко было забыть — тогда подпись зависала
+       посреди пустого поля. Теперь поле узнаётся по содержимому: если
+       внутри textarea, подпись сама встаёт к верхнему краю. */
+    .float:has(textarea) .float-label { @apply top-[1.7rem]; }
+    .float .input-bad ~ .float-label { @apply text-bad; }
+    .float .sel-btn   { @apply pt-0 pb-0; }
+    .float .sel-value { @apply pt-[1.15rem]; }
+
+    /* Пояснение к полю: та же круглая кнопка-призрак, что крестик в поиске,
+       только у правого края. Поле уступает ей место справа, чтобы длинное
+       значение не заезжало под иконку. Подпись при этом не всплывает от
+       нажатия на кнопку — поэтому обёртка здесь div, а подпись отдельный
+       label, а не один общий label на всё поле. */
+    .float:has(.input-tip) .input { @apply pr-12; }
+
+    /* выпадающий список */
+    .sel        { @apply relative block; }
+    .sel-btn    { @apply flex items-center justify-between gap-2 text-left cursor-pointer; }
+    /* поле у списка с рамкой, поэтому отступ на её толщину меньше:
+       так круг встаёт на ту же линию, что крестик и пояснение */
+    .sel-caret        { @apply -mr-[0.4375rem]; }
+    .float .sel-caret { @apply w-8 h-8; }
+    .sel-btn .ic{ @apply transition-transform duration-200; }
+    .sel[data-open="1"] .sel-btn .ic { @apply rotate-180; }
+    .sel[data-open="1"] .sel-btn,
+    .sel[data-open="1"] .sel-btn:hover { @apply border-brand shadow-ring; }
+    /* Список отсчитывается от окна, а не от поля, — как подсказка.
+       Иначе его режет любой контейнер со скрытым переполнением: окно
+       заявки с прокруткой, плитка, таблица. Место и ширину ему даёт
+       скрипт по рамке кнопки; если снизу не помещается — раскрывается
+       вверх. */
+    .sel-list {
+      @apply scroller fixed z-drop
+             max-h-64 overflow-auto p-1.5 m-0 list-none
+             bg-white rounded-input border border-line-soft shadow-e2;
+    }
+    .sel-opt {
+      @apply flex items-center justify-between gap-3 px-3 py-2.5 rounded-field
+             text-[0.9375rem] cursor-pointer transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-100;
+    }
+    .sel-opt .ic     { @apply opacity-0 text-brand transition-opacity duration-100; }
+    .sel-opt:hover,
+    .sel-opt[data-active="1"] { @apply bg-surface; }
+    .sel-opt[aria-selected="true"] { @apply text-brand font-semibold; }
+    .sel-opt[aria-selected="true"] .ic { @apply opacity-100; }
+
+    /* поле с подсказками и чипами */
+    .tags-box {
+      @apply flex flex-wrap items-center gap-1.5 w-full min-h-ctl-lg px-2.5 py-2
+             rounded-input border border-line bg-white cursor-text
+             transition-[padding,border-color,box-shadow] duration-150
+             [&:hover:not(:focus-within)]:border-line-strong;
+    }
+    .tags-box:focus-within { @apply border-brand shadow-ring; }
+    .float-up .tags-box,
+    .float:focus-within .tags-box { @apply pt-7 pb-2; }
+    /* Пока подпись не поднялась, она сама стоит внутри поля и работает
+       подсказкой. Родной placeholder в это время печатался бы ровно под
+       ней — два текста в одной строке. Показываем его только после того,
+       как подпись ушла наверх: по фокусу или когда появился первый чип. */
+    .float:not(.float-up):not(:focus-within) .tags-input::placeholder { color: transparent; }
+
+    .tags-input {
+      @apply flex-1 min-w-[7rem] h-7 p-0 border-0 bg-transparent outline-none
+             text-base text-ink placeholder:text-ink-faint;
+    }
+    .tag-x {
+      @apply flex items-center justify-center shrink-0 w-4 h-4 -mr-0.5 p-0 rounded-full border-0
+             bg-transparent text-current cursor-pointer opacity-60
+             transition-[opacity,box-shadow] duration-150 hover:opacity-100
+             focus-visible:outline-none focus-visible:shadow-ring;
+    }
+    .hints {
+      @apply scroller absolute left-0 right-0 top-[calc(100%+0.375rem)] z-drop
+             max-h-56 overflow-auto p-1.5 m-0 list-none
+             bg-white rounded-input border border-line-soft shadow-e2;
+    }
+    /* Строка подсказки — обычный текст, а не колонки. Подсвеченная часть
+       разбивает название на три куска, и в раскладке с раскидыванием по
+       краям они разъезжались бы по всей строке. */
+    .hint {
+      @apply block px-3 py-2.5 rounded-field
+             text-[0.9375rem] leading-snug cursor-pointer;
+    }
+    .hint:hover, .hint[data-active="1"] { @apply bg-surface; }
+    .hint b     { @apply text-brand font-semibold; }
+    .hint small { @apply text-[0.8125rem] text-ink-mute; }
+    .hints-empty { @apply px-3 py-3 text-[0.9375rem] text-ink-mute; }
+
+
+    .search             { @apply relative block; }
+    .search .input      { @apply pl-11 pr-11; }
+    .search > .ic       { @apply absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-mute pointer-events-none; }
+    /* Кнопка внутри поля — одна площадка на три роли: крестик в поиске,
+       пояснение к полю и стрелка выпадающего списка. Круг под иконкой
+       закрашивается при наведении, поэтому иконка читается как нажимаемая,
+       а не как украшение. Стрелка списка — не отдельная кнопка, а часть
+       поля, поэтому у неё нет своего наведения: круг заливается, когда
+       курсор на всём поле. */
+    .search .clear, .input-tip, .sel-caret, .tip-mark {
+      @apply flex items-center justify-center shrink-0 w-7 h-7 p-0 rounded-full border-0
+             bg-transparent text-ink-mute
+             transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-150
+             focus-visible:outline-none focus-visible:shadow-ring;
+    }
+    .search .clear:hover, .input-tip:hover,
+    .sel-btn:hover .sel-caret, .sel[data-open="1"] .sel-caret { @apply bg-surface text-ink; }
+    /* значок стоит не только на белом — в шапке таблицы серая подложка
+       совпала бы с фоном, поэтому у него круг на тон плотнее */
+    .tip-mark:hover { @apply bg-line-soft text-ink; }
+
+    .search .clear, .input-tip { @apply absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer; }
+    .input-tip { @apply w-8 h-8; }
+
+    /* Значок подсказки сам по себе: рядом с заголовком, в шапке таблицы,
+       в строке текста. В покое это просто иконка — ни рамки, ни заливки,
+       ничего от кнопки. Круг проступает только под курсором, чтобы было
+       видно, что на неё можно навести. */
+    .tip-mark { @apply inline-flex align-middle w-6 h-6 cursor-pointer; }
+
+    /* ---------- выбор ---------- */
+    .choice { @apply flex items-start gap-2.5 text-[0.9375rem] leading-6 text-ink cursor-pointer; }
+    .choice > span { @apply leading-6; }
+    .choice input {
+      @apply appearance-none shrink-0 w-6 h-6 bg-white cursor-pointer
+             border-2 border-line-hard transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-100
+             hover:border-brand checked:bg-brand checked:border-brand
+             focus-visible:outline-none focus-visible:shadow-ring
+             disabled:bg-line-soft disabled:border-line disabled:cursor-not-allowed;
+    }
+    .choice input:disabled + span { @apply text-ink-mute; }
+    /* Подпись у флажка, кружка и переключателя одна на все случаи —
+       0.9375rem основным цветом, и задаёт её сам элемент. Цвет прописан
+       явно не от избытка: внутри окна и карточки формы текст приглушён,
+       и подпись без своего цвета выцветала вместе с ним. Мельче и бледнее
+       её не делаем даже под галочкой согласия: это не примечание, а то,
+       с чем человек соглашается, и читаться оно должно наравне.
+
+       Строка согласия одна на все формы, и ссылок в ней две: согласие на
+       обработку персональных данных и политика конфиденциальности. Это
+       разные документы — первый про то, что данные можно обрабатывать,
+       второй про то, как с ними обращаются, — и закон требует оба. Одна
+       ссылка «на политику» покрывала бы только второй. */
+
+    .switch { @apply flex items-center gap-2.5 text-[0.9375rem] text-ink cursor-pointer; }
+    .switch input {
+      @apply appearance-none relative shrink-0 w-[2.6rem] h-6 rounded-full bg-line-track cursor-pointer
+             transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-200 checked:bg-brand
+             hover:bg-[#B0B8C5] checked:hover:bg-brand-dark
+             focus-visible:outline-none focus-visible:shadow-ring;
+    }
+
+    .pick {
+      @apply relative block cursor-pointer bg-white p-4 rounded-card border-2 border-line
+             transition-[border-color,background-color,box-shadow] duration-150 hover:border-[#A9BBD8];
+    }
+    .pick input  { @apply absolute opacity-0 pointer-events-none; }
+    .pick-name   { @apply block font-semibold text-base; }
+    .pick-note   { @apply block text-[0.875rem] leading-snug text-ink-mute mt-0.5; }
+    .pick .tick  { @apply absolute top-3 right-3 text-brand opacity-0 transition-opacity duration-150; }
+
+    /* ---------- загрузка ---------- */
+    .drop {
+      @apply flex flex-col items-center gap-1 text-center cursor-pointer bg-white
+             p-6 rounded-card border-2 border-dashed border-line
+             transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-300 ease-out hover:border-brand hover:bg-brand-wash;
+    }
+    .drop > .ic  { @apply text-brand mb-0.5 transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-300 ease-out; }
+    .drop-name   { @apply font-semibold text-brand transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-300 ease-out; }
+    .drop-hint   { @apply text-[0.875rem] text-ink-mute transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-300 ease-out; }
+    .drop:hover .drop-hint { @apply text-ink-soft; }
+    .drop input  { @apply hidden; }
+
+    .files       { @apply list-none m-0 p-0 flex flex-col gap-1.5 mt-3; }
+    .files li    { @apply flex items-center gap-2.5 text-[0.875rem] px-2.5 py-2 bg-surface rounded-field; }
+    .files li > .ic { @apply text-ink-mute; }
+    .files .name { @apply flex-1 min-w-0 truncate; }
+    .files .size { @apply text-ink-mute tabular-nums; }
+    .file-drop {
+      @apply flex items-center justify-center shrink-0 w-7 h-7 p-0 rounded-full border-0
+             bg-transparent text-ink-mute cursor-pointer
+             transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-150 hover:bg-white hover:text-bad focus-visible:outline-none focus-visible:shadow-ring;
+    }
+
+    /* ---------- вкладки ---------- */
+    /* Полоска не переносится: вкладки в два ряда читаются как два
+       переключателя. На узком экране полоска не шире колонки и
+       прокручивается вбок — кнопки не сжимаются. */
+    .tabs { @apply flex gap-1 p-1 w-fit max-w-full overflow-x-auto scroller bg-surface rounded-card; }
+    .tab  { @apply shrink-0 whitespace-nowrap; }
+    .tab  {
+      @apply font-semibold text-[0.9375rem] px-[1.125rem] h-ctl-sm rounded-field border-0
+             bg-transparent text-ink-soft cursor-pointer
+             transition-[color,background-color,box-shadow] duration-150
+             hover:text-ink focus-visible:outline-none focus-visible:shadow-ring;
+    }
+    .tab[aria-selected="true"] { @apply bg-white text-brand shadow-e1; }
+
+    /* На узком экране полоска превращается в список: четыре-пять
+       рубрик в строку не помещаются, а прокрутка вбок прячет половину
+       вариантов — человек не видит, из чего выбирает. Список делает
+       скрипт из самих вкладок, разметка в разделе не меняется; пока
+       скрипта нет, полоска работает по-старому. */
+    .tabs-sel { @apply block sm:hidden; }
+    .tabs[data-mobile="1"] { @apply hidden sm:flex; }
+
+    /* ---------- таблица ---------- */
+    /* заливка своя: таблица должна читаться и на цветном блоке,
+       а не только на белой странице */
+    /* Рамка у таблицы на тон плотнее, чем у карточки. Карточка — короткая
+       и стоит среди воздуха, её край читается и бледным. Рамка таблицы
+       длинная и вертикальная, а вертикальный волосок бледного цвета
+       экран часто размазывает на два полупрозрачных пикселя — и он
+       пропадает: таблица выглядит открытой справа, хотя рамка на месте.
+       Плотный тон переживает такое размазывание и остаётся линией. */
+    .tablewrap { @apply scroller overflow-x-auto rounded-card border border-line-strong bg-white; }
+    .tablewrap table { @apply border-collapse w-full text-[0.9375rem] min-w-[32rem]; }
+    /* Узкая — без минимальной ширины. Для таблиц, которым не нужна
+       прокрутка на узком экране: два-три коротких столбца сожмутся и
+       останутся читаемыми. Таких ставят по две-три в ряд (размер и цена,
+       вес и стоимость), и минимальная ширина, рассчитанная на широкую
+       таблицу, здесь мешала бы: три по 32rem в ряд не встанут, а одна
+       на телефоне уезжала бы за край и читалась обрезанной. */
+    .tablewrap-narrow table { @apply min-w-0; }
+    .tablewrap th, .tablewrap td { @apply px-3.5 py-2.5 text-left border-b border-line-soft; }
+    .tablewrap thead th { @apply text-[0.8125rem] font-semibold text-ink-mute bg-surface border-b border-line; }
+    /* Числовой столбец прижат к правому краю целиком — и ячейки, и
+       заголовок. Заголовку это задаётся тем же классом num, а не
+       утилитой text-right: правило шапки «.tablewrap th» весомее
+       одиночного класса утилиты, и утилита на нём не срабатывает —
+       заголовок остаётся слева, а числа под ним справа, вразнобой. */
+    .tablewrap th.num, .tablewrap td.num { @apply text-right tabular-nums; }
+    /* заголовок числового столбца не переносится: «Стоимость, ₽» в две
+       строки задирает шапку и отрывает единицу от названия */
+    .tablewrap th.num { @apply whitespace-nowrap; }
+    .tablewrap td.num { @apply font-medium; }
+    .tablewrap tbody tr:last-child td { @apply border-b-0; }
+    .tablewrap tbody tr { @apply transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-150; }
+    .tablewrap tbody tr:hover { @apply bg-[#FAFBFD]; }
+
+    /* ---------- метки и сообщения ---------- */
+    .chip { @apply inline-flex items-center gap-1.5 font-semibold text-[0.75rem] px-2.5 py-1 rounded-full bg-surface text-ink-soft border border-line; }
+    .chip .ic { @apply w-[0.95em] h-[0.95em]; }
+    .chip-brand { @apply bg-brand-wash text-brand border-brand-edge; }
+    .chip-jade  { @apply bg-jade-wash text-jade-dark border-[#B7E6DB]; }
+    .chip-sun   { @apply bg-sun-wash text-sun-dark border-sun-edge; }
+    .chip-ok    { @apply bg-ok-wash text-ok border-ok-edge; }
+    .chip-warn  { @apply bg-warn-wash text-warn-text border-warn-edge; }
+    .chip-warn .ic { @apply text-warn; }
+    .chip-bad   { @apply bg-bad-wash text-bad border-bad-edge; }
+
+    .note      { @apply flex items-start gap-2.5 p-4 rounded-field text-[0.9375rem] bg-brand-wash text-[#0B3F86] border border-brand-edge; }
+    .note .ic  { @apply mt-0.5; }
+    .note-ok   { @apply bg-ok-wash text-ok-text border-ok-edge; }
+    .note-warn { @apply bg-warn-wash text-warn-text border-warn-edge; }
+    .note-warn > .ic { @apply text-warn; }
+    .note-bad  { @apply bg-bad-wash text-bad-text border-bad-edge; }
+
+    /* ---------- тосты ---------- */
+    .toaster { @apply fixed right-4 bottom-4 z-toast flex flex-col gap-2 max-w-[min(23rem,calc(100vw-2rem))]; }
+    .toast {
+      @apply flex items-start gap-2.5 bg-white text-ink text-[0.9375rem] leading-snug
+             px-3.5 py-3 rounded-field border border-line-soft
+             border-l-[0.3125rem] border-l-brand-bright shadow-e2;
+    }
+    .toaster .toast { @apply animate-toast-in; }
+    .toast > .ic    { @apply mt-0 text-brand; }
+    .toast .txt     { @apply flex-1 min-w-0; }
+    .toast .txt b   { @apply block font-semibold; }
+    .toast .txt small { @apply text-[0.875rem] text-ink-soft; }
+    .toast .close {
+      @apply flex items-center justify-center shrink-0 w-6 h-6 p-0 -mt-0.5 -mr-1 rounded-full border-0
+             bg-transparent text-ink-mute cursor-pointer
+             transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-150 hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:shadow-ring;
+    }
+    .toast-ok   { @apply border-l-[#22A55F]; }
+    .toast-ok > .ic { @apply text-ok; }
+    .toast-warn { @apply border-l-sun; }
+    .toast-warn > .ic { @apply text-warn; }
+    .toast-bad  { @apply border-l-[#E14B3E]; }
+    .toast-bad > .ic { @apply text-bad; }
+
+    /* ---------- уведомления ---------- */
+    .bell       { @apply relative; }
+    .bell-badge {
+      @apply absolute -top-1 -right-1 flex items-center justify-center
+             w-5 h-5 p-0 rounded-full border-2 border-white
+             bg-bad text-white text-[0.6875rem] font-bold leading-none tabular-nums;
+    }
+    .bell-badge[data-wide="1"] { @apply w-auto min-w-[1.5rem] px-1.5; }
+    .notif-panel {
+      @apply absolute right-0 top-[calc(100%+0.5rem)] z-drop w-[22rem] max-w-[calc(100vw-2rem)]
+             bg-white rounded-card border border-line-soft shadow-e2 overflow-hidden;
+    }
+    .notif-head { @apply flex items-center justify-between gap-3 px-4 py-3 border-b border-line-soft; }
+    .notif-list { @apply scroller max-h-[19rem] overflow-y-auto; }
+    .notif {
+      @apply w-full flex items-start gap-3 text-left px-4 py-3.5 border-0 border-b border-line-soft
+             bg-white cursor-pointer transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-150 hover:bg-surface focus-visible:outline-none focus-visible:shadow-ring;
+    }
+    .notif-list .notif:last-child { @apply border-b-0; }
+    .notif-mark  { @apply flex items-center justify-center shrink-0 w-9 h-9 rounded-full; }
+    .notif-body  { @apply flex-1 min-w-0; }
+    .notif-title { @apply block font-semibold text-[0.9375rem] leading-snug text-ink; }
+    .notif-text  { @apply block text-[0.875rem] leading-snug text-ink-soft mt-0.5; }
+    .notif-time  { @apply block text-[0.75rem] text-ink-mute mt-1.5; }
+    .notif-dot   { @apply shrink-0 w-2 h-2 rounded-full bg-brand mt-2; }
+    .notif[data-read="1"] { @apply bg-white; }
+    .notif[data-read="1"] .notif-title { @apply font-medium text-ink-soft; }
+    .notif[data-read="1"] .notif-dot   { @apply invisible; }
+    .notif-foot { @apply px-4 py-3 border-t border-line-soft text-center; }
+    .notif-static { @apply cursor-default hover:bg-white; }
+
+    /* ---------- согласие на cookie ---------- */
+    /* Плашка внизу, на ярусе тостов: не окно и не шторка во весь экран —
+       страницу она не запирает, читать можно и не ответив. Две кнопки
+       равного веса действия, но разного веса вида: «Принять все» —
+       основная, «Только необходимые» — тихая. Одной кнопки «Понятно» нет:
+       она не даёт выбора, а согласие без выбора — не согласие. */
+    /* Охранное поле от краёв экрана: 1rem на телефоне, 2rem от 640px.
+       Плашка лежит поверх страницы, и прижатая к краю она читается как
+       часть того, что под ней, — особенно над тёмным подвалом. */
+    .cookie {
+      @apply fixed z-toast inset-x-4 bottom-4 sm:inset-x-auto sm:left-8 sm:bottom-8 sm:max-w-[26rem]
+             flex flex-col gap-3.5 bg-white text-ink px-5 py-4 rounded-card
+             border border-line shadow-e2 animate-toast-in;
+    }
+    .cookie .txt  { @apply m-0 text-[0.9375rem] leading-snug; }
+    .cookie .acts { @apply flex flex-wrap gap-2; }
+    .cookie-static { @apply static max-w-none sm:max-w-none animate-none shadow-e1; }
+
+    /* ---------- калькулятор ---------- */
+    .calc-grid   { @apply grid grid-cols-[repeat(4,2.75rem)] gap-2; }
+
+    /* ---------- модальные окна ---------- */
+    /* Охранное поле от краёв экрана то же, что у плашки cookie: 1rem
+       на телефоне, 2rem от 640px — и по обеим осям сразу. Браузер
+       сам даёт окну поля 19px по вертикали и 46 по горизонтали, и на
+       низком экране низ окна оказывается прижат к краю; поэтому и
+       ширина, и предельная высота считаются от поля, а margin: auto
+       держит окно по центру. */
+    .modal {
+      @apply p-0 border border-line bg-white text-ink rounded-card
+             w-[min(28rem,calc(100vw-2rem))] max-h-[calc(100dvh-2rem)]
+             shadow-e3;
+      margin: auto;
+    }
+    .modal-wide  { @apply w-[min(38rem,calc(100vw-2rem))]; }
+    @media (min-width: 640px) {
+      .modal      { @apply w-[min(28rem,calc(100vw-4rem))] max-h-[calc(100dvh-4rem)]; }
+      .modal-wide { @apply w-[min(38rem,calc(100vw-4rem))]; }
+    }
+    /* внутренние поля окна — те же, что у плитки: 1.75rem, от 640px
+       2.25rem; окно и есть плитка, только лежащая поверх страницы */
+    .modal-head  { @apply flex items-center justify-between gap-4 p-7 sm:p-9 mb-4 border-b border-line-soft; }
+    .modal-head-main { @apply flex items-center gap-3.5 min-w-0; }
+    .modal-title { @apply font-bold text-[1.25rem] leading-snug tracking-tight m-0; }
+    .modal-body  { @apply px-7 sm:px-9 pb-2 text-[0.9375rem] text-ink-soft; }
+    .modal-foot  { @apply flex flex-wrap items-center justify-end gap-3 p-7 sm:p-9 mt-4 border-t border-line-soft; }
+    .modal-foot-split { @apply justify-between; }
+    .modal-x {
+      @apply flex items-center justify-center shrink-0 w-8 h-8 p-0 -my-1 -mr-1.5 rounded-full border-0
+             bg-transparent text-ink-mute cursor-pointer
+             transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-150 hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:shadow-ring;
+    }
+
+    /* статичные макеты окон на странице */
+    .modal-demo { @apply bg-white rounded-card overflow-hidden border border-line shadow-e1; }
+
+    /* ---------- заявка в несколько шагов ---------- */
+    /* Полоска из равных отрезков — по одному на шаг: пройденные и
+       текущий синие. Цифры и названия шагов не выстраиваем в ряд —
+       на телефоне они не помещаются, а отрезки помещаются всегда;
+       название текущего шага — строкой под полоской. */
+    .wiz-bar        { @apply flex gap-1.5; }
+    .wiz-bar > span { @apply flex-1 h-1 rounded-full bg-line transition-colors duration-300; }
+    .wiz-bar > span[data-done="1"] { @apply bg-brand-bright; }
+    .wiz-cap        { @apply text-[0.8125rem] font-semibold text-ink-mute mt-2.5 m-0; }
+
+    /* ---------- схема шагов ---------- */
+    .steps        { @apply list-none m-0 p-0 flex flex-col; }
+    .steps li     { @apply grid grid-cols-[3rem_1fr] gap-5; }
+    .steps .marker{ @apply flex flex-col items-center; }
+    .steps .dot   { @apply flex items-center justify-center shrink-0 w-12 h-12 rounded-full font-extrabold text-[1.125rem] tabular-nums; }
+    .steps .rail  { @apply w-[0.1875rem] flex-1 min-h-[1.25rem] rounded-full; }
+    .steps li:last-child .rail { @apply bg-transparent; }
+    .steps .txt   { @apply pt-2.5 pb-7; }
+    .steps li:last-child .txt { @apply pb-0; }
+    .steps .txt b { @apply block font-bold text-[1.0625rem]; }
+    .steps .txt small { @apply block text-[0.9375rem] leading-normal text-ink-soft mt-1; }
+
+    .steps-outline .dot  { @apply bg-white text-brand border-2 border-brand; }
+    .steps-outline .rail { @apply bg-brand-wash; }
+    .steps-outline li:first-child .dot { @apply bg-brand text-white; }
+
+    /* Чередование сторон. Те же кружки и та же линия, но линия идёт по
+       середине, а текст встаёт то справа от неё, то слева. На свободной
+       стороне может стоять картинка — она не обязательна, шаг без неё
+       выглядит так же ровно. Раскладка нужна широкому блоку по центру
+       страницы; на узком экране всё возвращается в одну колонку. */
+    .steps-split li      { @apply md:grid-cols-[1fr_3rem_1fr] md:gap-x-8; }
+    .steps-split .marker { @apply row-span-2 md:row-span-1 md:col-start-2 md:row-start-1; }
+    .steps-split .txt    { @apply col-start-2 row-start-1 md:col-start-3 md:row-start-1 md:pb-10; }
+    .steps-split .pic    { @apply flex col-start-2 row-start-2 pb-7
+                                  md:col-start-1 md:row-start-1 md:pb-10 md:w-full md:justify-end; }
+    /* нечётные — слева: схема начинается с текста, а не с картинки */
+    .steps-split li:nth-child(odd) .txt { @apply md:col-start-1 md:text-right; }
+    .steps-split li:nth-child(odd) .pic { @apply md:col-start-3 md:justify-start; }
+    .steps-split li:last-child .txt,
+    .steps-split li:last-child .pic { @apply pb-0 md:pb-0; }
+    .steps-split .pic img { @apply block w-full max-w-[12rem] h-auto; }
+
+    /* Заключительный пункт: после шагов схема обращается к человеку.
+       Стоит в общем ряду и по общему правилу — на своей стороне и со
+       значком, как остальные. Отличается только кружком: он залит,
+       и внутри значок вместо номера, потому что нумеровать призыв
+       наравне с шагами было бы неправдой. */
+    .steps .end .dot   { @apply bg-brand text-white; }
+
+
+    /* ---------- аккордеон ---------- */
+    .acc { @apply bg-white rounded-card overflow-hidden border border-line; }
+    .acc details + details { @apply border-t border-line-soft; }
+    .acc summary {
+      @apply flex items-center justify-between gap-6 cursor-pointer list-none
+             px-6 py-5 font-semibold text-base transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-150
+             hover:bg-[#F7F9FC] focus-visible:outline-none focus-visible:shadow-ring;
+    }
+    /* у раскрытого заголовка заливки при наведении нет: она примыкала
+       вплотную к тексту ответа и сливалась с ним в одно пятно */
+    .acc details[open] summary:hover { @apply bg-transparent; }
+    .acc summary .ic { @apply text-ink-mute transition-transform duration-200; }
+    .acc details[open] summary .ic { @apply rotate-180; }
+    /* Ответ завёрнут в отдельную обёртку без отступов: высоту сворачиваем
+       у неё, а отступы остаются на тексте внутри. Иначе при нулевой высоте
+       отступы всё равно занимали бы место и створка дёргалась бы в конце. */
+    .acc-fold  { @apply overflow-hidden; }
+    .acc .body { @apply px-6 pb-6 text-[0.9375rem] text-ink-soft max-w-[64ch]; }
+
+    /* ---------- меню узкого экрана ---------- */
+    /* Список, который выпадает из-под шапки, когда пунктам не хватает
+       места в строку. Своей кнопки у него нет: значок с тремя чертами
+       ставится обычной кнопкой-иконкой, тихой, — заводить ради него
+       отдельный вид не за чем.
+
+       Панель отсчитывается от шапки, а не от окна: стоит внутри неё и
+       прижата к её нижнему краю. Поэтому она сама подстраивается под
+       любую высоту шапки, и её не нужно переставлять, если шапка
+       станет выше или ниже.
+
+       Высота ограничена и панель прокручивается: пунктов может стать
+       больше, чем помещается на телефоне, и тогда список обязан
+       листаться, а не уезжать за нижний край экрана. */
+    .menu {
+      @apply scroller absolute inset-x-0 top-full z-drop
+             flex flex-col items-start gap-1 px-5 py-4
+             max-h-[70vh] overflow-y-auto
+             bg-white border-t border-line-soft shadow-e2;
+    }
+    /* воздух между пунктами добавляем самим пунктам, а не всему
+       подряд: у кнопки высота своя, и внешние поля её ломают */
+    .menu .link-go { @apply py-1.5; }
+
+    /* ---------- крошки и страницы ---------- */
+    .crumbs   { @apply flex flex-wrap items-center gap-1.5 text-[0.875rem] text-ink-mute; }
+    .crumbs a { @apply text-ink-soft no-underline transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-150 hover:text-brand hover:underline; }
+    .crumbs .ic { @apply w-4 h-4 text-ink-mute; }
+    .crumbs [aria-current] { @apply text-ink; }
+
+    /* Постраничная навигация — ряд обычных кнопок, а не свой вид.
+       Текущая страница — основная кнопка, остальные тихие, стрелки
+       такие же. Здесь задан только промежуток между ними: размер,
+       радиус, наведение и кольцо фокуса кнопка приносит с собой. */
+    .pager { @apply flex flex-wrap gap-1.5; }
+
+    /* ---------- выворотка на фирменном синем ---------- */
+    /* На сайте на этом синем стоят шапка и первый экран. Внутри такого
+       блока меняется только то, что иначе перестало бы читаться: текст,
+       ссылки и метки. Кнопки не трогаем — бирюзовая и белая вторичная
+       на синем читаются как есть, и обе уже есть в ките. */
+    .on-brand          { @apply bg-brand-bright text-white; }
+    .on-brand .t-lead,
+    .on-brand .t-small { @apply text-white/85; }
+    .on-brand .link-go { @apply text-white hover:text-white/75; }
+    .on-brand .link    { @apply text-white hover:text-white/75; }
+
+    /* ---------- выворотка на фирменном чёрном ---------- */
+    /* Тот же приём и те же правила, только фон — чернильный. Чёрный
+       нужен там, где светлого подряд слишком много: им начинается
+       страница и им же разделяются белые разделы. Синий при этом
+       остаётся цветом действия, а не цветом фона. Кнопки снова не
+       трогаем: основная синяя и бирюзовая на чёрном читаются как есть,
+       белая вторичная — тем более. */
+    .on-ink          { @apply bg-ink text-white; }
+    .on-ink .t-lead,
+    .on-ink .t-small { @apply text-white/80; }
+    .on-ink .link-go { @apply text-white hover:text-white/70; }
+    .on-ink .link    { @apply text-white hover:text-white/70; }
+
+    /* ---------- подвал ---------- */
+    /* Два вида одной разметки. Светлый — по умолчанию: белый фон,
+       линия сверху, логотип чернильный, ссылки тёмного ряда. Тёмный
+       (foot-dark) — та же выворотка, что у чёрного блока: логотип и
+       ссылки белые, линии — белые на четверть, копирайт приглушён.
+       Оба вида — с одними и теми же пунктами; отличается только фон,
+       и выбирается он по соседу сверху: под светлой страницей тёмный
+       подвал закрывает её, под тёмным блоком — сливается с ним, и
+       тогда нужен светлый. Боковых полей у подвала нет — их даёт
+       колонка внутри, та же, что у страницы. Тёмный подвал на сайте
+       стоит плиткой: с полями от краёв экрана и снизу, как первый
+       экран, — сайт открывается и закрывается одной формой. */
+    .foot      { @apply bg-white text-ink pt-16 pb-10 border-t border-line; }
+    /* Нижняя строка отодвинута от линии заметно: при тесном отступе
+       копирайт и юридические ссылки читаются как ещё один столбец
+       подвала, а не как подпись под ним. */
+    .foot .foot-bar { @apply flex flex-wrap items-center justify-between gap-x-8 gap-y-3
+                             mt-14 pt-10 border-t border-line-soft text-base text-ink-mute; }
+    .foot-dark { @apply bg-ink text-white border-0 rounded-block; }
+    .foot-dark .link-go-ink { @apply text-white/85 hover:text-white; }
+    .foot-dark .foot-bar    { @apply border-white/15 text-white/60; }
+
+    /* ---------- светлая плитка с подсветкой ---------- */
+    /* Плоская подложка без рамки и без тени, крупное скругление — то же,
+       что у чёрного блока, — и два цветных пятна у верхнего края.
+
+       Пятен именно два и они разного цвета: голубое слева, бирюзовое
+       справа. Одним цветом плитка выглядит подкрашенной, двумя —
+       освещённой: на их стыке появляется третий оттенок, которого нет
+       ни в одном из них. Оба сдвинуты кверху и наружу, чтобы свет
+       читался падающим сверху, а не пятном посреди плитки.
+
+       Рамки и тени нет намеренно. Карточка отделяет одно от другого
+       линией и высотой; плитка — только собственной заливкой, и ряд из
+       них выглядит спокойнее, чем ряд обведённых карточек. Поэтому
+       плитка не заменяет карточку: карточка нужна там, где предметы
+       сравнивают между собой, плитка — там, где их просто перечисляют. */
+    .bento      {
+      @apply relative overflow-hidden rounded-block bg-surface p-7 sm:p-9;
+      background-image:
+        radial-gradient(64% 58% at 22% -6%, rgba(0,121,255,.20), rgba(0,121,255,0) 72%),
+        radial-gradient(62% 56% at 82% -4%, rgba(26,188,157,.20), rgba(26,188,157,0) 72%);
+    }
+    /* ---------- полоса с прокруткой ---------- */
+    /* На телефоне ряд плиток не ставится друг под друга, а едет вбок:
+       вторая плитка выглядывает за правым краем экрана и этим говорит,
+       что есть продолжение. Полоса выходит за поля колонки — ей их
+       компенсируют отрицательным отступом, а внутренний padding
+       возвращает первую плитку на место колонки. Прокрутка с привязкой:
+       плитка всегда останавливается у левого края. Своей полосы
+       прокрутки нет — её роль играет выглядывающая плитка. От sm полоса
+       становится обычной сеткой из двух колонок. */
+    .swipe {
+      @apply flex gap-4 overflow-x-auto -mx-4 px-4;
+      scroll-snap-type: x mandatory;
+      /* привязка считается от края поля, а не от края экрана: иначе
+         первая плитка прилипает к самому краю и теряет поле колонки */
+      scroll-padding-inline: 1rem;
+      scrollbar-width: none;
+    }
+    .swipe::-webkit-scrollbar { display: none; }
+    .swipe > * { @apply shrink-0 w-[86%]; scroll-snap-align: start; }
+    @media (min-width: 640px) {
+      .swipe     { @apply grid grid-cols-2 overflow-visible mx-0 px-0; }
+      .swipe > * { @apply w-auto; }
+    }
+
+    /* Широкая плитка — без пятен вовсе. Пятна — это свет на небольшой
+       плитке; на плитке во всю ширину полосы они либо разъезжаются по её
+       концам, либо размазываются в одно бледное облако, и в обоих случаях
+       перестают читаться как свет. Широкой плитке хватает подложки. */
+    .bento-wide { background-image: none; }
+
+    /* ---------- подсветка у нижнего края ---------- */
+    /* Тёмный блок, у которого низ светится цветом. Нужен затем же, зачем
+       и сам чёрный: разбить полосу светлых разделов. Но чёрный прямоугольник
+       на белой странице — это дыра, а со свечением он читается как включённый
+       экран, и страница от него не проваливается.
+
+       Собран из двух слоёв, и оба — обычные заливки.
+
+       Цвет даёт лента: она лежит у нижнего края, идёт во всю ширину и вдвое
+       шире блока. Едет влево ровно на половину себя, а вторая половина
+       повторяет первую — поэтому на перескоке шва не видно. Поверх ленты
+       плывут три шара; они добавляют яркости в своих местах и сбивают
+       движение с ровного хода, чтобы рисунок не начал повторяться на глаз.
+
+       Форму даёт маска — овал с серединой на нижней кромке. По ширине он
+       уже блока, по высоте — во весь слой: оттого свечение заметно поднимается
+       к центру и круто сходит к бокам. Прозрачность в нём убывает от середины
+       к краю, поэтому и подъём, и спад плавные, без ступеней. Растянуть овал
+       шире блока значит выпрямить горку: чем он шире, тем ровнее верхний край.
+       Форму нельзя изображать самими шарами: посаженные на разной высоте, они
+       дают один бугор посередине и обрыв по краям.
+
+       Слой лежит под содержимым всегда, в каком бы месте разметки он ни
+       стоял: у него отрицательный ярус, а блок замкнут в свой контекст
+       наложения — иначе отрицательный ярус увёл бы слой под фон страницы.
+       Без этого слой, записанный после текста, ложился поверх него и
+       подкрашивал буквы.
+
+       Маска работает по коробке слоя, но край у неё полупрозрачный на
+       один пиксель — и там, где под ним лента в полную силу, на кромке
+       блока проступала цветная нитка. Поэтому у слоя своё скрытое
+       переполнение: всё за его коробкой срезано начисто.
+
+       Высота слоя задана долей от блока, а не в ремах: свечение должно
+       занимать примерно нижнюю треть — и в первом экране высотой в пол-окна,
+       и в блоке пониже. В ремах пришлось бы подбирать число под каждый
+       случай, и на невысоком блоке свечение накрыло бы его целиком. */
+    .glow        { @apply relative isolate overflow-hidden rounded-block; }
+    .glow-lights {
+      @apply absolute inset-x-0 bottom-0 h-[30%] -z-10 overflow-hidden pointer-events-none;
+      -webkit-mask-image: radial-gradient(76% 100% at 50% 100%, #000 0%, rgba(0,0,0,.82) 32%, rgba(0,0,0,.34) 64%, transparent 100%);
+              mask-image: radial-gradient(76% 100% at 50% 100%, #000 0%, rgba(0,0,0,.82) 32%, rgba(0,0,0,.34) 64%, transparent 100%);
+    }
+    .glow-band {
+      @apply absolute inset-y-0 left-0 w-[200%];
+      background: linear-gradient(90deg,
+        #1ABC9D 0%,  #0079FF 16.7%, #6E56F8 33.3%,
+        #1ABC9D 50%, #0079FF 66.7%, #6E56F8 83.3%, #1ABC9D 100%);
+      animation: glow-band 22s linear infinite;
+    }
+    /* Шар: коробка квадратная, форма названа словом circle. Без него
+       радиальный градиент рисует эллипс по коробке, и пятно расплывается
+       вслед за её пропорциями. Все три сидят на одной высоте — склон
+       делает маска, а не они. */
+    .glow-orb    { @apply absolute w-[21rem] h-[21rem] bottom-[-11rem]; }
+    .glow-orb-a  { left: 4%;  background: radial-gradient(circle closest-side, rgba(26,188,157,1), rgba(26,188,157,0)); animation: glow-orb-a 9s ease-in-out infinite alternate; }
+    .glow-orb-b  { left: 38%; background: radial-gradient(circle closest-side, rgba(0,121,255,1), rgba(0,121,255,0));   animation: glow-orb-b 12s ease-in-out infinite alternate; }
+    .glow-orb-c  { left: 72%; background: radial-gradient(circle closest-side, rgba(110,86,248,1), rgba(110,86,248,0)); animation: glow-orb-c 15s ease-in-out infinite alternate; }
+
+    /* ---------- подсказка ---------- */
+    /* Подсказка лежит в конце страницы и отсчитывается от окна, а не от
+       соседей. Иначе её обрезали бы контейнеры со скрытым переполнением —
+       аккордеон, таблица с прокруткой, панель уведомлений. Сторону выбирает
+       сама: если у нужного края места нет, разворачивается в другую, а
+       вдоль своей стороны прижимается к экрану. Стрелка при этом
+       продолжает целиться в то, что поясняет. */
+    .tip {
+      @apply fixed left-0 top-0 z-tip max-w-[17rem] px-3 py-2 rounded-field
+             text-[0.8125rem] leading-snug font-medium text-white bg-ink
+             shadow-e2 pointer-events-none opacity-0
+             transition-opacity duration-150;
+    }
+    .tip[data-show="1"] { @apply opacity-100; }
+    /* Хвостик — треугольник, а не повёрнутый квадрат. У квадрата вторая
+       половина заезжает на пузырь и проступает на его заливке углами:
+       заливка у пузыря с переходом, а хвостик одноцветный, и в месте
+       наложения видно грань. Треугольник стоит снаружи и заходит внутрь
+       ровно на пиксель — так между ним и пузырём не остаётся волоска,
+       а накладывается только его основание, цвет которого совпадает
+       с краем пузыря. */
+    .tip-arrow { @apply absolute block; }
+    .tip[data-side="top"] .tip-arrow {
+      @apply w-3 h-1.5 -ml-1.5;
+      bottom: -0.3125rem; background: #101828;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+    .tip[data-side="bottom"] .tip-arrow {
+      @apply w-3 h-1.5 -ml-1.5;
+      top: -0.3125rem; background: #1D2939;
+      clip-path: polygon(50% 0, 0 100%, 100% 100%);
+    }
+    .tip[data-side="left"] .tip-arrow {
+      @apply w-1.5 h-3 -mt-1.5;
+      right: -0.3125rem; background: #17202E;
+      clip-path: polygon(0 0, 100% 50%, 0 100%);
+    }
+    .tip[data-side="right"] .tip-arrow {
+      @apply w-1.5 h-3 -mt-1.5;
+      left: -0.3125rem; background: #17202E;
+      clip-path: polygon(100% 0, 0 50%, 100% 100%);
+    }
+
+    /* ---------- прочее ---------- */
+    .swatch      { @apply bg-white rounded-field overflow-hidden border border-line; }
+    .swatch-chip { @apply block h-[4.5rem]; }
+    .swatch-name { @apply block px-2.5 pt-2 font-semibold text-[0.875rem]; }
+    .swatch-hex  { @apply block px-2.5 pb-2.5 not-italic text-[0.75rem] text-ink-mute tabular-nums; }
+
+    .icon-cell { @apply flex flex-col items-center gap-1.5 p-3 bg-surface rounded-field border border-line-soft text-[0.6875rem] text-ink-mute text-center; }
+    .icon-cell .ic { @apply w-7 h-7 text-ink; stroke-width: 0.09375rem; }
+
+    /* .link — ссылка внутри текста: подчёркнута, потому что должна
+       отличаться от окружающих слов.
+       .link-go — переход к другому месту: отдельная строка.
+       Заливки и подчёркивания нет, роль читается по цвету и стрелке. */
+    .link { @apply text-brand underline underline-offset-2 decoration-1 transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-150 hover:text-brand-dark; }
+
+    .link-go {
+      @apply inline-flex items-center gap-1.5 font-semibold text-[0.9375rem] leading-snug
+             text-brand no-underline cursor-pointer bg-transparent border-0 p-0
+             rounded-field transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-150 hover:text-brand-dark
+             focus-visible:outline-none focus-visible:shadow-ring;
+    }
+    .link-go .ic { @apply w-[1.05em] h-[1.05em] transition-[color,background-color,border-color,fill,stroke,box-shadow] duration-150; }
+
+    /* Тёмный вариант — для ряда, где ссылок много и подряд: меню в
+       шапке, столбцы в подвале. Синим такой ряд превращается в сплошное
+       цветное пятно и перетягивает внимание с того, ради чего человек
+       пришёл. Цвет тут не роль, а вес: тёмным ряд стоит спокойно, а под
+       курсором пункт становится синим — то есть цвет остаётся у того
+       единственного места, куда человек собрался. Одиночная ссылка
+       посреди текста тёмной не бывает: там её как раз надо заметить. */
+    .link-go-ink { @apply text-ink hover:text-brand; }
+
+  }
+
+  /* --- то, что утилитами не выражается --- */
+
+  .choice input[type=checkbox] { border-radius: 0.375rem; }
+  .choice input[type=radio]    { border-radius: 50%; }
+  .choice input[type=checkbox]:checked {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5l10 -10'/%3E%3C/svg%3E");
+    background-size: 1.15rem;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .choice input[type=radio]:checked {
+    background-image: radial-gradient(circle, #fff 0 25%, transparent 27%);
+  }
+  .switch input::after {
+    content: ""; position: absolute; top: 0.1875rem; left: 0.1875rem;
+    width: 1.125rem; height: 1.125rem; border-radius: 50%; background: #fff;
+    box-shadow: 0 0.0625rem 0.125rem rgba(16,24,40,.25);
+    transition: transform .18s;
+  }
+  .switch input:checked::after { transform: translateX(1.1rem); }
+  .pick:has(input:checked)      { border-color: #0064E0; background: #EAF2FE; }
+  .pick:has(input:checked) .tick{ opacity: 1; }
+  .pick:has(input:focus-visible){ box-shadow: 0 0 0 0.1875rem rgba(0,100,224,.22); }
+  .float:focus-within .float-label,
+  .float.float-up .float-label {
+    top: 0.9375rem; font-size: 0.75rem; font-weight: 600;
+  }
+  .float:focus-within .float-label { color: #0064E0; }
+  .float:has(textarea):focus-within .float-label,
+  .float:has(textarea).float-up .float-label { top: 0.9375rem; }
+
+  /* полосы прокрутки */
+  html {
+    scrollbar-width: auto;
+    scrollbar-color: #A9B2C0 #F5F7FA;
+  }
+  html::-webkit-scrollbar { width: 1.25rem; height: 1.25rem; }
+  html::-webkit-scrollbar-track { background: #F5F7FA; }
+  html::-webkit-scrollbar-thumb {
+    background-color: #A9B2C0; border-radius: 999px;
+    border: 0.25rem solid #F5F7FA; background-clip: padding-box;
+    transition: background-color .15s;
+  }
+  html::-webkit-scrollbar-thumb:hover { background-color: #7C8697; }
+
+  .scroller { scrollbar-width: auto; scrollbar-color: #B9C1CD transparent; }
+  .scroller::-webkit-scrollbar { width: 1.125rem; height: 1.125rem; }
+  .scroller::-webkit-scrollbar-track { background: transparent; }
+  .scroller::-webkit-scrollbar-corner { background: transparent; }
+  .scroller::-webkit-scrollbar-thumb {
+    background-color: #B9C1CD; border-radius: 999px;
+    border: 0.1875rem solid #fff; background-clip: padding-box;
+    transition: background-color .15s;
+  }
+  .scroller::-webkit-scrollbar-thumb:hover { background-color: #7C8697; }
+  .scroller-grey::-webkit-scrollbar-thumb { border-color: #F5F7FA; }
+
+  dialog.modal::backdrop { background: rgba(16, 24, 40, .5); }
+  dialog.modal[open] { animation: modal-in .18s ease-out; }
+  @keyframes modal-in { from { opacity: 0; transform: translateY(0.75rem); } }
+
+  /* лента уезжает ровно на половину себя: вторая половина повторяет первую,
+     поэтому круг замыкается без стыка */
+  @keyframes glow-band  { to { transform: translateX(-50%); } }
+  /* шары только покачиваются вдоль ленты: расходиться далеко им нельзя,
+     иначе между ними открывается ровное место */
+  @keyframes glow-orb-a { from { transform: translateX(-14%); } to { transform: translateX(26%); } }
+  @keyframes glow-orb-b { from { transform: translateX(22%);  } to { transform: translateX(-18%); } }
+  @keyframes glow-orb-c { from { transform: translateX(-20%); } to { transform: translateX(18%); } }
+  @media (prefers-reduced-motion: reduce) {
+    dialog.modal[open] { animation: none; }
+  }
+
+  /* ===== мягкие тонирующие градиенты =====
+     Правило одно: один оттенок, переход строго по вертикали, разница
+     между краями не больше пяти процентов. Свет сверху, а не заливка. */
+
+  /* поверхности */
+  .card, .modal, .modal-demo, .acc, .tablewrap,
+  .sel-list, .hints, .notif-panel, .toast {
+    background-image: linear-gradient(180deg, #FFFFFF 0%, #FAFBFD 100%);
+  }
+  .input, .tags-box, select.input {
+    background-image: linear-gradient(180deg, #FFFFFF 0%, #FCFDFE 100%);
+  }
+  .tip { background-image: linear-gradient(180deg, #1D2939 0%, #101828 100%); }
+
+  .tabs, .files li {
+    background-image: linear-gradient(180deg, #F7F9FC 0%, #F1F4F8 100%);
+  }
+  .tablewrap thead th {
+    background-image: linear-gradient(180deg, #F8FAFC 0%, #F2F5F9 100%);
+  }
+
+  /* Кнопки: свет проезжает по заливке.
+     Заливка нарисована втрое выше кнопки и поделена на три ступени.
+     В покое видна верхняя — ровно тот вид, что был изначально. При
+     наведении заливка проезжает на среднюю, при нажатии — на нижнюю,
+     самую тёмную. Светлее кнопка не становится нигде: верхний край
+     в покое и есть исходный цвет. Ничего не смещается — двигается
+     только то, какая часть заливки попадает в кнопку.
+
+     Нижние ступени темнее, но не бледнее. Если просто уводить цвет
+     к чёрному, он по дороге теряет насыщенность и кнопка сереет —
+     на бирюзовой это было заметнее всего. Поэтому каждая следующая
+     ступень взята темнее по светлоте, но с той же или большей
+     чистотой цвета: тон остаётся тот же, гаснет только свет. */
+  .btn {
+    background-image: linear-gradient(180deg,
+      #1272F0 0%, #0064E0 33.33%, #0055C9 66.67%, #00429B 100%);
+    background-size: 100% 300%;
+    background-position: 0% 0%;
+    /* Считаем размер и положение заливки по внешнему краю, вместе с рамкой,
+       и не размножаем её. Иначе на полоску рамки попадал край соседней
+       плитки — тонкая тёмная линия сверху в покое и светлая снизу при
+       наведении. */
+    background-origin: border-box;
+    background-repeat: no-repeat;
+    transition: background-position .5s cubic-bezier(.33, 1, .68, 1),
+                background-color .5s cubic-bezier(.33, 1, .68, 1),
+                color .15s, border-color .15s, box-shadow .15s;
+  }
+  .btn:hover  { background-position: 0% 50%; }
+  /* нажатие срабатывает вдвое быстрее наведения: отклик на палец
+     должен быть мгновенным, а возврат — спокойным */
+  .btn:active { background-position: 0% 100%; transition-duration: .1s; }
+  .btn:disabled { background-image: none; }
+
+  /* витрина: закрепить ступень, чтобы показать их рядом.
+     В кит не входит — на сайте состояния наступают сами. */
+  .btn[data-state="hover"] { background-position: 0% 50%; }
+  .btn[data-state="press"] { background-position: 0% 100%; }
+
+  .btn-jade      { background-image: linear-gradient(180deg, #2ACDAD 0%, #1ABC9D 33.33%, #00B392 66.67%, #009878 100%); }
+  .btn-sun       { background-image: linear-gradient(180deg, #FFD962 0%, #FECD39 33.33%, #F9BC15 66.67%, #EDA80B 100%); }
+  .btn-danger    { background-image: linear-gradient(180deg, #D2473A 0%, #C0362C 33.33%, #AE2B20 66.67%, #971D13 100%); }
+  .btn-soft      { background-image: linear-gradient(180deg, #F8FAFC 0%, #F1F4F8 33.33%, #E3E9F1 66.67%, #D4DCE7 100%); }
+  .btn-secondary { background-image: linear-gradient(180deg, #FFFFFF 0%, #FDFEFF 33.33%, #E2ECFD 66.67%, #D0E0FB 100%); }
+  .btn-quiet     { background-image: linear-gradient(180deg, rgba(247,249,252,0) 0%, rgba(247,249,252,0) 33.33%, #F7F9FC 41.33%, #F0F3F8 66.67%, #E9EDF3 100%); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn { transition: none; }
+  }
+
+  /* метки и сообщения: та же заливка, только со светом сверху */
+  .chip::before, .note::before { content: none; }
+  .chip        { background-image: linear-gradient(180deg, rgba(255,255,255,.7) 0%, rgba(255,255,255,0) 100%); }
+  .note        { background-image: linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 100%); }
+  .notif-mark  { background-image: linear-gradient(180deg, rgba(255,255,255,.6) 0%, rgba(255,255,255,0) 100%); }
+  .bell-badge  { background-image: linear-gradient(180deg, #D2473A 0%, #C0362C 100%); }
+  .steps-outline li:first-child .dot { background-image: linear-gradient(180deg, #1272F0 0%, #0064E0 100%); }
+  .steps .dot:not([class]) { background-image: none; }
+
+  /* страница: два мягких пятна фирменных цветов только в самом верху */
+  body {
+    background-image:
+      radial-gradient(60rem 26rem at 16% -10rem, rgba(0,121,255,.13), transparent 70%),
+      radial-gradient(44rem 22rem at 88% -14rem, rgba(26,188,157,.10), transparent 70%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  .acc summary::-webkit-details-marker { display: none; }
+  .search input[type=search]::-webkit-search-cancel-button { display: none; }
+  .search .clear[hidden] { display: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-spin, .animate-toast-in { animation: none !important; }
+    /* свечение остаётся, но перестаёт двигаться */
+    .glow-band, .glow-orb { animation: none !important; }
+    * { transition: none !important; }
+  }
+
+/* ============================================================
+   САЙТ, а не кит: оформление страниц MarketHelp.
+   Сюда попадает только то, что не является элементом интерфейса, —
+   шапка, логотип, бегущая строка. Всё остальное берётся из кита.
+   ============================================================ */
+@layer components {
+  /* ---------- САЙТ: шапка, логотип, бегущая строка ---------- */
+
+  /* Шапка закреплена всё время: меню и телефон под рукой на любой
+     высоте страницы. Держится липким положением, а не отрывом из
+     потока, — поэтому место под неё остаётся занятым само собой и
+     страница не подпрыгивает. Линии снизу нет: край шапки и так виден
+     по тому, что под неё уходит.
+
+     Заливка стеклянная: белого чуть больше половины, остальное — то,
+     что проезжает под шапкой, размытое и с поднятой насыщенностью.
+     Без поддержки размытия заливка остаётся глухой белой: полупрозрачная
+     шапка без него — это просто просвечивающий текст поверх текста. */
+  .site-head { position: sticky; top: 0; background: #fff; }
+
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .site-head {
+      background: rgba(255, 255, 255, .55);
+      -webkit-backdrop-filter: blur(1.75rem) saturate(180%);
+              backdrop-filter: blur(1.75rem) saturate(180%);
+    }
+    /* Пока меню открыто, стекло выключается. Под шапкой в этот момент
+       не страница, а белая панель меню — размывать нечего, зато
+       полупрозрачная шапка над ровным белым читается грязным пятном. */
+    .site-head:has(.menu:not([hidden])) {
+      background: #fff;
+      -webkit-backdrop-filter: none;
+              backdrop-filter: none;
+    }
+  }
+
+  /* Логотип наверху страницы — фирменный голубой, при прокрутке
+     перетекает в чернильный. Переход долгий: шапка стоит на месте,
+     и резкая смена цвета в ней читается как подмена картинки, а
+     медленная — как отклик на прокрутку. Цвет берётся значком из кита
+     через currentColor, поэтому меняется одним свойством. */
+  .site-logo { color: #0079FF; transition: color .6s ease; }
+  .site-head[data-scrolled="1"] .site-logo { color: #101828; }
+
+  /* Бегущая строка. Внутри несколько одинаковых копий содержимого: пока
+     первая уезжает влево, следующая занимает её место, и шва не видно.
+     Промежуток задан здесь, и справа стоит такой же — иначе половина
+     ряда не совпадает с целым числом промежутков и на стыке копий раз
+     в круг видно подёргивание. */
+  .marquee     { @apply relative overflow-hidden; }
+  /* 96 секунд на половину ряда — примерно 45 пикселей в секунду. */
+  .marquee-row { @apply flex w-max items-center gap-10 pr-10; animation: marquee 96s linear infinite; }
+}
+
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .site-logo   { transition: none; }
+  /* строка стоит, а ряд листается рукой */
+  .marquee-row { animation: none; }
+  .marquee     { overflow-x: auto; }
+}

@@ -1,0 +1,11 @@
+# Переводы строк в репозитории всегда LF: собирается сайт на Linux,
+# и CRLF из Windows ломал бы diff на каждой правке.
+* text=auto eol=lf
+
+# Двоичное git не трогает
+*.png  binary
+*.jpg  binary
+*.ico  binary
+*.pdf  binary
+*.woff binary
+*.woff2 binary
