@@ -8,6 +8,7 @@
 !/.gitignore
 !/.gitattributes
 !/README.md
+!/REDIRECTS.md
 
 # служебное
 .DS_Store

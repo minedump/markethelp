@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Crumbs, Swipe, Table, Text } from '@/components/ui';
 import { Head, Section } from '@/components/site/Layout';
 import { PostCard } from '@/components/site/PostCard';
+import { CheckList } from '@/components/site/PhotoBlock';
 import { ArticleSchema, BreadcrumbSchema } from '@/components/site/Schema';
 import { ARTICLES, BLOG_RUBRICS, BLOG_SECTIONS, POSTS } from '@/content/blog';
 import { ROUTES, asset } from '@/content/site';
@@ -97,6 +98,13 @@ export default async function PostPage({ params }: Params) {
 
       <Section>
         <article>
+          {/* вступление — абзацы до первого заголовка, как в исходнике */}
+          {article.intro?.map((t, i) => (
+            <p key={i} className="text-[0.9375rem] leading-relaxed text-ink-soft mt-3 first:mt-0">
+              {t}
+            </p>
+          ))}
+
           {article.sections.map((s, i) => {
             const no = i + 1;
             return (
@@ -104,11 +112,16 @@ export default async function PostPage({ params }: Params) {
                 <Text variant="h3" as="h2">
                   {s.title}
                 </Text>
-                {s.paras.map((t, j) => (
+                {s.paras?.map((t, j) => (
                   <p key={j} className="text-[0.9375rem] leading-relaxed text-ink-soft mt-3">
                     {t}
                   </p>
                 ))}
+
+                {/* перечень правил — тем же списком с галочками, что
+                    в остальных разделах сайта: новых видов списка
+                    ради одной статьи не заводим */}
+                {s.list ? <CheckList rows={s.list} className="mt-4" /> : null}
 
                 {article.illustration?.after === no ? (
                   <figure className="m-0 mt-6">
