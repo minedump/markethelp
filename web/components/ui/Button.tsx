@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, AnchorHTMLAttributes, ReactNode } from 'react';
 import Link from 'next/link';
+import { isPlain } from '@/lib/href';
 
 /**
  * Кнопка кита (.btn и её виды).
@@ -48,10 +49,12 @@ export function Button({ variant = 'primary', size = 'md', icon = false, classNa
 
 type LinkButtonProps = Common & AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
 
-/** Та же кнопка, но ссылкой: внутренние адреса идут через next/link. */
+/**
+ * Та же кнопка, но ссылкой: страницы сайта идут через next/link,
+ * внешние адреса и файлы — обычным <a>.
+ */
 export function LinkButton({ variant = 'primary', size = 'md', icon = false, className, href, ...rest }: LinkButtonProps) {
   const classes = cls(variant, size, icon, className);
-  const external = /^(https?:|tel:|mailto:|#)/.test(href);
-  if (external) return <a href={href} className={classes} {...rest} />;
+  if (isPlain(href)) return <a href={href} className={classes} {...rest} />;
   return <Link href={href} className={classes} {...rest} />;
 }

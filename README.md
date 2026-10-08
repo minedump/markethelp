@@ -74,6 +74,26 @@ node kit/check.js        # все фирменные цвета в класса�
 node kit/tip-test.js     # геометрия подсказки, 12 случаев
 ```
 
+## Прайс-лист в PDF
+
+Файл лежит в сборке — `web/public/pricelist/`, на него ведут кнопки
+«Скачать прайс в PDF» на страницах тарифов и услуг. Адрес задан один
+раз, в `PRICELIST` (`web/content/pages.ts`).
+
+Сам он не пересобирается. Цены на странице тарифов идут из
+`web/content/prices.ts`, а PDF — из `pricelist/prices.py`; это два
+отдельных файла с одними и теми же числами, и при правке цен нужно
+пройти обе стороны, иначе сайт и скачанный прайс разойдутся:
+
+```
+# 1. поправить цены в обоих файлах
+#    pricelist/prices.py   — для PDF
+#    web/content/prices.ts — для сайта
+# 2. пересобрать PDF и положить его в сборку
+python pricelist/build.py && python pricelist/make-pdf.py
+cp "pricelist/MarketHelp — прайс-лист 2026.pdf" web/public/pricelist/
+```
+
 ## Перенос со старого сайта
 
 Записи блога перенесены с Tilda в `web/content/blog.ts`. Карта

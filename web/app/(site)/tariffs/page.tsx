@@ -59,7 +59,9 @@ export default function TariffsPage() {
         page={PAGES.tariffs}
         actions={
           <>
-            <LinkButton href={PRICELIST.href}>
+            {/* download — чтобы файл сохранился, а не открылся
+                во встроенном просмотрщике поверх страницы */}
+            <LinkButton href={PRICELIST.href} download>
               <Icon name="download" />
               {PRICELIST.title}
             </LinkButton>

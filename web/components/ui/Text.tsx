@@ -1,5 +1,6 @@
 import type { ElementType, HTMLAttributes, ReactNode, AnchorHTMLAttributes } from 'react';
 import NextLink from 'next/link';
+import { isPlain } from '@/lib/href';
 import { Icon } from '@/components/Icon';
 
 /**
@@ -38,7 +39,7 @@ type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & { href: string; child
 /** Ссылка в тексте: подчёркнутая, фирменного синего. */
 export function TextLink({ href, className, ...rest }: LinkProps) {
   const classes = ['link', className].filter(Boolean).join(' ');
-  if (/^(https?:|tel:|mailto:|#)/.test(href)) return <a href={href} className={classes} {...rest} />;
+  if (isPlain(href)) return <a href={href} className={classes} {...rest} />;
   return <NextLink href={href} className={classes} {...rest} />;
 }
 
@@ -58,7 +59,7 @@ export function LinkGo({ href, ink = false, arrow = false, className, children, 
       {arrow ? <Icon name="chevron-right" /> : null}
     </>
   );
-  if (/^(https?:|tel:|mailto:|#)/.test(href)) {
+  if (isPlain(href)) {
     return <a href={href} className={classes} {...rest}>{body}</a>;
   }
   return <NextLink href={href} className={classes} {...rest}>{body}</NextLink>;

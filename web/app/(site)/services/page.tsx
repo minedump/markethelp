@@ -23,7 +23,7 @@ export default function ServicesPage() {
             <LinkButton variant="secondary" href={ROUTES.tariffs}>
               Смотреть тарифы
             </LinkButton>
-            <LinkGo href={PRICELIST.href}>
+            <LinkGo href={PRICELIST.href} download>
               <Icon name="download" />
               {PRICELIST.title}
             </LinkGo>
