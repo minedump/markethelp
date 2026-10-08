@@ -50,12 +50,14 @@ export function OrganizationSchema() {
         address: {
           '@type': 'PostalAddress',
           addressCountry: 'RU',
-          addressRegion: 'Московская область',
-          addressLocality: 'Подольск',
-          streetAddress: 'Комсомольская улица, 1с22',
-          postalCode: '142100',
+          addressRegion: 'Москва',
+          addressLocality: 'Москва',
+          streetAddress: 'Котляковская улица, 6с3',
+          postalCode: '115201',
         },
-        geo: { '@type': 'GeoCoordinates', latitude: 55.426064, longitude: 37.55575 },
+        /* geo не ставим: проверенных координат дома у нас нет, а
+           выдуманная точка в разметке хуже её отсутствия — адреса
+           поисковику достаточно */
         openingHours: 'Mo-Su 09:00-21:00',
         openingHoursSpecification: {
           '@type': 'OpeningHoursSpecification',

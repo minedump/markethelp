@@ -38,9 +38,9 @@ export const CONTACTS: Contact[] = typoDeep([
   {
     icon: 'warehouse',
     title: 'Склад',
-    value: 'МО, Подольск, Комсомольская улица, 1с22',
-    href: 'https://yandex.ru/maps/?mode=routes&rtext=~55.426064%2C37.555750&rtt=auto',
-    note: 'Московская область; приёмка товара и осмотр склада по записи',
+    value: 'Москва, Котляковская улица, 6с3',
+    href: 'https://yandex.ru/maps/?mode=routes&rtext=~%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0%2C%20%D1%83%D0%BB%D0%B8%D1%86%D0%B0%20%D0%9A%D0%BE%D1%82%D0%BB%D1%8F%D0%BA%D0%BE%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%2C%206%D1%813&rtt=auto',
+    note: 'юг Москвы; приёмка товара и осмотр склада по записи',
   },
   {
     icon: 'clock',
@@ -66,7 +66,7 @@ export const REQUISITES: Requisite[] = typoDeep([
   },
   {
     key: 'Склад',
-    value: '142100, МО, Подольск, Комсомольская улица, 1с22',
+    value: '115201, Москва, Котляковская улица, 6с3',
   },
   {
     key: 'ИНН / КПП',

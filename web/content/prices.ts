@@ -595,7 +595,7 @@ export const RETURNS: Price[] = typoDeep([
 export const INTL: Line[] = typoDeep([
   {
     title: 'Автомобилем из Китая, Турции, Европы',
-    note: 'Сборный груз, до склада в Подольске',
+    note: 'Сборный груз, до склада в Москве',
     price: 'от 350 ₽ / кг',
   },
   {

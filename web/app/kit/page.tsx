@@ -790,7 +790,7 @@ const FOOT_COLUMNS = [
     links: [
       { title: '+7 495 955-18-79', href: 'tel:+74959551879', icon: 'phone' as const },
       { title: 'info@markethelp.ru', href: 'mailto:info@markethelp.ru', icon: 'message' as const },
-      { title: 'МО, Подольск, Комсомольская улица, 1с22', href: '#', icon: 'warehouse' as const },
+      { title: 'Москва, Котляковская улица, 6с3', href: '#', icon: 'warehouse' as const },
     ],
   },
 ];
