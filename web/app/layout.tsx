@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Manrope } from 'next/font/google';
 import { IconSprite } from '@/components/Icon';
 import { Metrika } from '@/components/site/Metrika';
+import { PhoneGoal } from '@/components/site/PhoneGoal';
 import { TipLayer } from '@/components/ui/Tip';
 import { ToastProvider } from '@/components/ui/Toast';
 import { ORG, SITE_URL } from '@/content/site';
@@ -61,6 +62,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* тосты всплывают поверх страницы из любого её места */}
         <ToastProvider>{children}</ToastProvider>
         <Metrika />
+        {/* нажатие на номер — целью Метрики, одним слушателем на страницу */}
+        <PhoneGoal />
       </body>
     </html>
   );

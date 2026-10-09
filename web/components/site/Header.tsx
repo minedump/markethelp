@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Icon, Logo } from '@/components/Icon';
 import { LinkGo } from '@/components/ui';
-import { APP, NAV_MAIN, PHONE, ROUTES } from '@/content/site';
+import { APP, GOALS, NAV_MAIN, PHONE, ROUTES } from '@/content/site';
+import { goal } from '@/lib/goal';
 
 /**
  * Шапка сайта.
@@ -139,7 +140,10 @@ function Phone() {
       className="link-go"
       type="button"
       aria-label="Показать телефон целиком"
-      onClick={() => setShown(true)}
+      onClick={() => {
+        setShown(true);
+        goal(GOALS.phoneReveal);
+      }}
     >
       <Icon name="phone" />
       <span>
