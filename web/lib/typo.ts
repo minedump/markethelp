@@ -7,6 +7,13 @@
  * загрузке модуля, поэтому править тексты можно обычными пробелами,
  * а на странице они встанут уже прошитыми.
  *
+ * Ретроспективных проверок (?<=…) здесь нет намеренно. Содержание
+ * попадает и в клиентскую сборку — его тянут за собой шапка и формы, —
+ * а Safari научился им только в 16.4; на айфоне постарше такой шаблон
+ * не разбирается вовсе, и страница падает целиком ещё до отрисовки.
+ * Вместо них правила смотрят на предыдущий знак сами, по его месту
+ * в строке: поведение то же, а разбирается везде.
+ *
  * Правила:
  *  - предлоги и союзы из одной-трёх букв не остаются в конце строки;
  *    цепочка «и в», «а не» прошивается целиком;
@@ -21,6 +28,7 @@ const NB = ' ';
 
 /* В JS \w — только латиница, поэтому буква везде пишется явно. */
 const W = '[\\p{L}\\p{N}_]';
+const WORD = /[\p{L}\p{N}_]/u;
 
 /** короткие слова, за которыми пробел неразрывный */
 const BEFORE =
@@ -30,40 +38,58 @@ const BEFORE =
 /** частицы, перед которыми пробел неразрывный */
 const AFTER = 'же ли бы б'.split(' ');
 
-/* слово начинается: после пробела, скобки, кавычки или дефиса */
-const LEAD = '(?<![^\\s («„"\\-])';
+/* слово начинается: в начале строки либо после пробела, скобки,
+   кавычки или дефиса */
+const OPENS = /[\s («„"-]/;
 
-const before = new RegExp(LEAD + '(' + BEFORE.join('|') + ') (?=[' + W.slice(1, -1) + '«„"(+\\-—–№\\d])', 'giu');
-const after = new RegExp('(?<=[' + W.slice(1, -1) + '»)]) (' + AFTER.join('|') + ')(?=[\\s .,;:!?)»])', 'giu');
+const before = new RegExp('(' + BEFORE.join('|') + ') (?=[' + W.slice(1, -1) + '«„"(+\\-—–№\\d])', 'giu');
+const after = new RegExp(' (' + AFTER.join('|') + ')(?=[\\s .,;:!?)»])', 'giu');
+const afterPrev = /[\p{L}\p{N}_»)]/u;
 const dash = / (?=—)/g;
-const range = /(?<=\d) – (?=\d)/g;
-const thousands = /(?<=\d) (?=\d{3}(?!\d))/g;
+const range = /(\d) – (?=\d)/g;
+const thousands = /(\d) (?=\d{3}(?!\d))/g;
 const unit = new RegExp(
-  '(?<=[\\d%]) (?=(?:₽|кг|г|т|м²|м³|м|см|мм|л|шт|ед|дн|дней|дня|день|час|часа|часов|мин|' +
+  '([\\d%]) (?=(?:₽|кг|г|т|м²|м³|м|см|мм|л|шт|ед|дн|дней|дня|день|час|часа|часов|мин|' +
     'рабоч|недел|мес|лет|год|года|SKU|единиц|артикул|%)(?!' + W + '))',
   'giu',
 );
-const timeRange = /(?<![\d:])(\d{1,2}[:.]\d{2}) (до|—|–|-) (\d{1,2}[:.]\d{2})/g;
+const timeRange = /(\d{1,2}[:.]\d{2}) (до|—|–|-) (\d{1,2}[:.]\d{2})/g;
 const numPrefix = new RegExp(
-  '(?<!' + W + ')(№|стр\\.|г\\.|ул\\.|д\\.|с\\.|п\\.|от|до|с|по|за|около|более|свыше|через|каждые) (?=\\d)',
+  '(№|стр\\.|г\\.|ул\\.|д\\.|с\\.|п\\.|от|до|с|по|за|около|более|свыше|через|каждые) (?=\\d)',
   'giu',
 );
 const phone = /\+7 (\d{3}) (\d{3})/g;
-const pct = /(?<=\d) %/g;
+const pct = /(\d) %/g;
+
+/** знак перед найденным куском — или пусто, если кусок в начале строки */
+const prevChar = (s: string, at: number) => (at > 0 ? s[at - 1] : '');
 
 /** Прошить неразрывные пробелы в одной строке. */
 export function typo(s: string): string {
   return s
     .replace(dash, NB)
-    .replace(range, NB + '–' + NB)
-    .replace(thousands, NB)
-    .replace(pct, NB + '%')
-    .replace(unit, NB)
+    .replace(range, (_m, d: string) => d + NB + '–' + NB)
+    .replace(thousands, (_m, d: string) => d + NB)
+    .replace(pct, (_m, d: string) => d + NB + '%')
+    .replace(unit, (_m, d: string) => d + NB)
     .replace(phone, '+7' + NB + '$1' + NB + '$2')
-    .replace(timeRange, (_m, a, mid, b) => a + NB + mid + NB + b)
-    .replace(numPrefix, (_m, p) => p + NB)
-    .replace(before, (_m, w) => w + NB)
-    .replace(after, (_m, w) => NB + w);
+    /* время: «9:00 до 21:00» целиком, но только если слева не цифра
+       и не двоеточие — иначе зацепим кусок более длинной записи */
+    .replace(timeRange, (m, a: string, mid: string, b: string, at: number, str: string) => {
+      const p = prevChar(str, at);
+      return /[\d:]/.test(p) ? m : a + NB + mid + NB + b;
+    })
+    /* «№ 152», «д. 4»: перед сокращением не должно быть буквы */
+    .replace(numPrefix, (m, w: string, at: number, str: string) =>
+      WORD.test(prevChar(str, at)) ? m : w + NB)
+    /* предлог не повисает в конце строки */
+    .replace(before, (m, w: string, at: number, str: string) => {
+      const p = prevChar(str, at);
+      return p === '' || OPENS.test(p) ? w + NB : m;
+    })
+    /* частица прижата к слову слева */
+    .replace(after, (m, w: string, at: number, str: string) =>
+      afterPrev.test(prevChar(str, at)) ? NB + w : m);
 }
 
 /**
