@@ -33,6 +33,12 @@ type Props = {
   steps: WizardStep[];
   submitLabel?: string;
   onSubmit?: () => void;
+  /**
+   * Запретить отправку на последнем шаге: окно не форма, и браузер
+   * сам ничего не проверит — согласие на обработку данных сторожит
+   * этим признаком.
+   */
+  submitDisabled?: boolean;
 };
 
 export function Wizard({
@@ -42,6 +48,7 @@ export function Wizard({
   steps,
   submitLabel = 'Отправить заявку',
   onSubmit,
+  submitDisabled = false,
 }: Props) {
   const [step, setStep] = useState(0);
   const last = steps.length - 1;
@@ -76,6 +83,7 @@ export function Wizard({
             </Button>
           ) : (
             <Button
+              disabled={submitDisabled}
               onClick={() => {
                 onSubmit?.();
                 onClose();

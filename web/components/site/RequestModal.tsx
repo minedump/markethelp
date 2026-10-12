@@ -30,6 +30,11 @@ function opts(list: readonly string[]) {
 
 export function RequestProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
+  /* Согласие на обработку данных: пустое по умолчанию — галочку ставит
+     человек, а не мы за него. Пока её нет, «Отправить» не нажимается:
+     окно не форма, и браузер сам ничего не проверит. Закрытое окно
+     сбрасывает её вместе с шагами — заявку начинают заново. */
+  const [agree, setAgree] = useState(false);
   const router = useRouter();
   const show = useMemo(() => () => setOpen(true), []);
 
@@ -50,10 +55,14 @@ export function RequestProvider({ children }: { children: ReactNode }) {
       {children}
       <Wizard
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          setOpen(false);
+          setAgree(false);
+        }}
         title={FORM.title}
         submitLabel={FORM.submit}
         onSubmit={submit}
+        submitDisabled={!agree}
         steps={[
           {
             title: FORM.steps.goods,
@@ -134,7 +143,12 @@ export function RequestProvider({ children }: { children: ReactNode }) {
                   autoComplete="email"
                 />
                 <FileDrop title={FORM.files.title} hint={FORM.files.hint} />
-                <Choice defaultChecked>
+                <Choice
+                  name="consent"
+                  required
+                  checked={agree}
+                  onChange={(e) => setAgree(e.target.checked)}
+                >
                   <Rich>{FORM.consent}</Rich>
                 </Choice>
               </>

@@ -40,7 +40,7 @@ export function ContactForm() {
         wrapClassName="sm:col-span-2"
       />
       <FloatTextarea label={CONTACT_FORM.note} name="note" wrapClassName="sm:col-span-2" />
-      <Choice className="sm:col-span-2" name="consent" defaultChecked required>
+      <Choice className="sm:col-span-2" name="consent" required>
         <Rich>{FORM.consent}</Rich>
       </Choice>
       <div className="sm:col-span-2">

@@ -50,7 +50,7 @@ export function LegalPage({
             ))}
           </nav>
 
-          <div className="max-w-[44rem]">
+          <div className="doc-body max-w-[44rem]">
             {sections.map((s, i) => (
               <section key={s.title} id={`${slug}-${i + 1}`} className="pt-8 first:pt-0">
                 <Text variant="h3" as="h2">

@@ -1076,12 +1076,30 @@
   .marquee     { @apply relative overflow-hidden; }
   /* 96 секунд на половину ряда — примерно 45 пикселей в секунду. */
   .marquee-row { @apply flex w-max items-center gap-10 pr-10; animation: marquee 96s linear infinite; }
+
+  /* ---------- ПРАВОВЫЕ СТРАНИЦЫ: содержание сбоку ---------- */
+
+  /* Договор, оферта, политика: содержание стоит рядом с текстом и
+     остаётся на виду, по нему переходят много раз подряд. Прыжок
+     через полдокумента сбивает: непонятно, вперёд ушли или назад.
+     Поэтому прокрутка к разделу плавная. Задана она документу —
+     прокручивается он, а не колонка с текстом.
+
+     Отступ сверху — высота закреплённой шапки, иначе заголовок
+     раздела уезжает под неё. У всех разделов, кроме первого, два
+     ряда своего отступа сверху, поэтому им хватает меньшего: так
+     заголовок встаёт под шапкой на одной высоте у любого раздела. */
+  html:has(.doc-body) { scroll-behavior: smooth; }
+  .doc-body > section             { scroll-margin-top: 3.25rem; }
+  .doc-body > section:first-child { scroll-margin-top: 5.25rem; }
 }
 
 @keyframes marquee { to { transform: translateX(-50%); } }
 
 @media (prefers-reduced-motion: reduce) {
   .site-logo   { transition: none; }
+  /* к разделу переходят мгновенно: отступ под шапку остаётся */
+  html:has(.doc-body) { scroll-behavior: auto; }
   /* строка стоит, а ряд листается рукой */
   .marquee-row { animation: none; }
   .marquee     { overflow-x: auto; }

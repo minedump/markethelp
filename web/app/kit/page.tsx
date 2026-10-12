@@ -676,7 +676,7 @@ export default function KitPage() {
                       </div>
                       <FloatInput label="Почта — пришлём расчёт" type="email" inputMode="email" />
                       <FileDrop hint="PDF, XLSX, JPG, MP4 — до 25 МБ. Необязательно" />
-                      <Choice defaultChecked>
+                      <Choice>
                         Даю <TextLink href="#">согласие на обработку персональных данных</TextLink> и
                         принимаю <TextLink href="#">политику конфиденциальности</TextLink>
                       </Choice>
