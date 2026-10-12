@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
+import { readConsent, saveConsent, type Consent } from '@/lib/consent';
 import { Button } from './Button';
 
 /**
@@ -14,16 +15,16 @@ import { Button } from './Button';
  * не являются.
  *
  * Ответ запоминается в браузере, и плашка больше не показывается.
+ * Он же решает, грузить ли счётчик: плашка не просто закрывается,
+ * а отвечает за то, что обещает (`lib/consent.ts`).
  * Охранное поле от краёв экрана то же, что у всего остального: 1rem
  * на телефоне, 2rem от 640px.
  */
-const KEY = 'cookie-consent';
-
 type Props = {
   children: ReactNode;
   /** для витрины: плашка стоит в потоке, ответ не запоминается */
   demo?: boolean;
-  onAnswer?: (answer: 'all' | 'required') => void;
+  onAnswer?: (answer: Consent) => void;
 };
 
 export function CookieBanner({ children, demo = false, onAnswer }: Props) {
@@ -32,25 +33,16 @@ export function CookieBanner({ children, demo = false, onAnswer }: Props) {
   const [show, setShow] = useState(demo);
 
   useEffect(() => {
-    if (demo) return;
-    let saved: string | null = null;
-    try {
-      saved = localStorage.getItem(KEY);
-    } catch {
-      /* приватное окно или запрет на хранилище: спрашиваем каждый раз */
-    }
-    if (!saved) setShow(true);
+    /* приватное окно или запрет на хранилище: ответа нет, спрашиваем
+       каждый раз — и счётчик каждый раз ждёт ответа */
+    if (!demo && !readConsent()) setShow(true);
   }, [demo]);
 
   if (!show) return null;
 
-  function answer(value: 'all' | 'required') {
+  function answer(value: Consent) {
     if (!demo) {
-      try {
-        localStorage.setItem(KEY, value);
-      } catch {
-        /* записать некуда — плашка просто закроется до конца сеанса */
-      }
+      saveConsent(value);
       setShow(false);
     }
     onAnswer?.(value);
