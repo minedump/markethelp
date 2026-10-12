@@ -42,5 +42,8 @@ export const DOCUMENTS: Document[] = typoDeep([
   },
 ]);
 
-/** Карточку предприятия одним файлом пришлёт менеджер — пока ссылки нет. */
-export const REQUISITES_FILE = { title: 'Скачать карточку предприятия', href: '#' };
+/** Карточка предприятия одним файлом — лежит рядом с сайтом, как прайс. */
+export const REQUISITES_FILE = {
+  href: '/requisites/MarketHelp — карточка предприятия.pdf',
+  title: 'Скачать карточку предприятия',
+};

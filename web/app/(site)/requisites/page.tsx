@@ -21,7 +21,7 @@ export default function RequisitesPage() {
         page={PAGES.requisites}
         parents={[{ title: 'Документы', href: ROUTES.documents }]}
         actions={
-          <LinkButton variant="secondary" href={REQUISITES_FILE.href}>
+          <LinkButton variant="secondary" href={REQUISITES_FILE.href} download>
             <Icon name="download" />
             {REQUISITES_FILE.title}
           </LinkButton>

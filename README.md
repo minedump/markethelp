@@ -94,6 +94,25 @@ python pricelist/build.py && python pricelist/make-pdf.py
 cp "pricelist/MarketHelp — прайс-лист 2026.pdf" web/public/pricelist/
 ```
 
+## Карточка предприятия в PDF
+
+Файл лежит в сборке — `web/public/requisites/`, на него ведёт кнопка
+«Скачать карточку предприятия» на странице реквизитов. Адрес задан
+один раз, в `REQUISITES_FILE` (`web/content/documents.ts`).
+
+Собирается сборщиком `card/` рядом с репозиторием — один лист A4:
+логотип с контактами сверху, под ними таблица. Реквизиты он читает
+прямо из `web/content/contacts.ts`, поэтому двух списков, как у цен,
+здесь нет: поправить нужно только содержание сайта и пересобрать.
+
+```
+# после правки REQUISITES в web/content/contacts.ts
+python card/build.py && python card/make-pdf.py
+```
+
+`make-pdf.py` сам кладёт готовый файл в `web/public/requisites/`.
+Печатает Chrome без окна, и ему нужна сеть: стили и шрифт идут с CDN.
+
 ## Цели Метрики
 
 Имена целей — в `GOALS` (`web/content/site.ts`), отправка — через
