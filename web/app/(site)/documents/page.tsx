@@ -29,6 +29,12 @@ export default function DocumentsPage() {
               <Text variant="h4" as="h2">
                 <LinkGo href={d.href}>{d.title}</LinkGo>
               </Text>
+              {/* Что будет по нажатию: файл скачается, страница откроется.
+                  У файла — вес, чтобы решение принималось до загрузки. */}
+              <Text variant="small" className="mt-1 text-ink-mute">
+                {d.kind}
+                {d.size ? ', ' + d.size : ''}
+              </Text>
               <Text variant="small" className="mt-1.5 max-w-[44rem]">
                 {d.note}
               </Text>
