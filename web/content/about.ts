@@ -15,7 +15,7 @@ export type Client = { pic: string; title: string; note: string };
 export const ABOUT_FACTS: AboutFact[] = typoDeep([
   {
     title: 'На рынке',
-    big: 'с 2013',
+    big: 'с 2019',
     note: 'года: начинали со склада под один маркетплейс, сейчас отгружаем на семь',
   },
   {

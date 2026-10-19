@@ -249,7 +249,7 @@ export const SECTIONS: Section[] = [
     owner: 'Продукт менеджер',
     note: 'Каждая строка стоит на сайте прямо сейчас. Отмечайте проверенное.',
     items: [
-      { id: 'claim-2013', text: 'На рынке с 2013 года', where: 'О компании' },
+      { id: 'claim-since', text: 'На рынке с 2019 года', where: 'О компании' },
       { id: 'claim-area', text: 'Склад 3 500 м²', where: 'О компании, Склад' },
       {
         id: 'claim-markets',
