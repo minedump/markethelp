@@ -245,7 +245,7 @@ export const SECTIONS: Section[] = [
     note: 'Каждая строка стоит на сайте прямо сейчас. Отмечайте проверенное.',
     items: [
       { id: 'claim-since', text: 'На рынке с 2019 года', where: 'О компании' },
-      { id: 'claim-area', text: 'Склад 3 500 м²', where: 'О компании, Склад' },
+      { id: 'claim-area', text: 'Общая складская площадь 3 500 м²', where: 'О компании, Склад' },
       {
         id: 'claim-markets',
         text: '7 площадок: OZON, Wildberries, Яндекс Маркет, Мегамаркет, AliExpress, Lamoda, ВсеИнструменты',

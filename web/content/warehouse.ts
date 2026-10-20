@@ -34,7 +34,7 @@ export const WAREHOUSE_ZONES: Zone[] = typoDeep([
 
 export const WAREHOUSE_FACTS: WarehouseFact[] = typoDeep([
   {
-    title: 'Площадь',
+    title: 'Общая складская площадь',
     big: '3 500 м²',
     /* площадь складом ещё не подтверждена — см. about.ts */
     note: 'стеллажное и паллетное хранение под одной крышей',
