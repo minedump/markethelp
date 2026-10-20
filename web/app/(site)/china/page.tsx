@@ -5,6 +5,7 @@ import { PageHead } from '@/components/site/PageHead';
 import { NumberList } from '@/components/site/NumberList';
 import { PhotoBlock } from '@/components/site/PhotoBlock';
 import {
+  CHINA_ADDRESS,
   CHINA_OPS,
   CHINA_ROUTES,
   CHINA_SECTIONS,
@@ -32,7 +33,21 @@ export default function ChinaPage() {
           title={CHINA_WAREHOUSE.title}
           note={CHINA_WAREHOUSE.note}
           rows={CHINA_WAREHOUSE.rows}
-        />
+        >
+          {/* Адрес под списком: иероглифы крупнее латиницы — в Китае
+              показывают именно их, а латиница идёт расшифровкой. */}
+          <div className="mt-6">
+            <Text variant="small" className="text-ink-mute">
+              {CHINA_ADDRESS.label}
+            </Text>
+            <Text variant="lead" as="p" className="mt-1">
+              {CHINA_ADDRESS.zh}
+            </Text>
+            <Text variant="small" className="mt-1 text-ink-mute">
+              {CHINA_ADDRESS.en}
+            </Text>
+          </div>
+        </PhotoBlock>
       </Section>
 
       {/* Что делаем на месте — четыре пункта с крупными номерами
