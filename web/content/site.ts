@@ -46,7 +46,7 @@ export const WAREHOUSE = {
   title: 'Москва, Котляковская улица, 6с3',
   full: '115201, Москва, Котляковская улица, 6с3',
   href: 'https://yandex.ru/maps/?mode=routes&rtext=~%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0%2C%20%D1%83%D0%BB%D0%B8%D1%86%D0%B0%20%D0%9A%D0%BE%D1%82%D0%BB%D1%8F%D0%BA%D0%BE%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%2C%206%D1%813&rtt=auto',
-  hours: 'Ежедневно с 9:00 до 21:00',
+  hours: 'Ежедневно с 9:00 до 19:00',
 } as const;
 
 /**

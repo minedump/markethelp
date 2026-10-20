@@ -575,7 +575,7 @@ export default function KitPage() {
           <Sheet title="Сообщения" className="mt-4">
             <div className="flex flex-col gap-2.5">
               <Note title="Все цены без НДС.">Итоговая стоимость рассчитывается индивидуально под ваш объём.</Note>
-              <Note tone="ok" title="Заявка отправлена.">Менеджер перезвонит в течение часа, ежедневно с 09:00 до 21:00.</Note>
+              <Note tone="ok" title="Заявка отправлена.">Менеджер перезвонит в течение часа, ежедневно с 09:00 до 19:00.</Note>
               <Note tone="warn" title="Поставка задерживается.">Склад Коледино не принимает — ожидание у ворот больше часа.</Note>
               <Note tone="bad" title="Не удалось отправить форму.">Проверьте телефон и попробуйте ещё раз.</Note>
             </div>
@@ -699,7 +699,7 @@ export default function KitPage() {
           <Sheet title="Подсказки" className="mt-4">
             <div className="flex flex-wrap items-center gap-3">
               <Button variant="quiet" icon aria-label="Скачать прайс" data-tip="Скачать прайс в PDF"><Icon name="download" /></Button>
-              <Button variant="quiet" icon aria-label="Позвонить" data-tip="Звонок на колл-центр, до 21:00"><Icon name="phone" /></Button>
+              <Button variant="quiet" icon aria-label="Позвонить" data-tip="Звонок на колл-центр, до 19:00"><Icon name="phone" /></Button>
               <Button variant="quiet" icon aria-label="Удалить" data-tip="Убрать позицию из поставки"><Icon name="trash" /></Button>
               <span className="t-small text-ink-mute">наведите или пройдите табом</span>
             </div>

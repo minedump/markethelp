@@ -58,12 +58,12 @@ export function OrganizationSchema() {
         /* geo не ставим: проверенных координат дома у нас нет, а
            выдуманная точка в разметке хуже её отсутствия — адреса
            поисковику достаточно */
-        openingHours: 'Mo-Su 09:00-21:00',
+        openingHours: 'Mo-Su 09:00-19:00',
         openingHoursSpecification: {
           '@type': 'OpeningHoursSpecification',
           dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
           opens: '09:00',
-          closes: '21:00',
+          closes: '19:00',
           name: hours,
         },
         areaServed: 'RU',
