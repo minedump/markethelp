@@ -86,12 +86,27 @@ export const GOALS = {
 } as const;
 
 /**
- * Личный кабинет живёт на своём поддомене и запускается позже сайта.
- * Пока ready: false, кнопка входа скрыта и заявка никуда не уходит —
- * приёмник появится вместе с кабинетом.
+ * Вход в личный кабинет. Кабинет — не часть этого сайта: он живёт
+ * на своём поддомене под складской системой, поэтому ссылка внешняя
+ * и ведёт прямо на страницу входа.
+ *
+ * Пока ready: false, кнопка входа скрыта — вести её некуда.
  */
 export const APP = {
-  href: 'https://app.markethelp.ru/',
+  href: 'https://markethelp.wmscelicom.ru/',
+  title: 'Личный кабинет',
+  ready: true,
+} as const;
+
+/**
+ * Приёмник заявок. Пока ready: false, формы никуда не отправляют
+ * и ведут на «Заявка принята» — чтобы путь был виден целиком.
+ *
+ * Это отдельный выключатель, а не APP.ready: кабинет уже работает,
+ * а приёмника ещё нет, и один флаг на двоих включил бы форму
+ * в пустоту.
+ */
+export const INBOX = {
   ready: false,
 } as const;
 
@@ -157,6 +172,7 @@ export const FOOT_COLUMNS: { title: string; links: NavLink[] }[] = typoDeep([
       { title: 'Условия работы', href: ROUTES.terms },
       { title: 'Блог', href: ROUTES.blog },
       { title: 'Контакты', href: ROUTES.contacts },
+      { title: APP.title, href: APP.href, external: true },
     ],
   },
   {

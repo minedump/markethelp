@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Rich } from '@/components/Rich';
 import { Choice, FileDrop, FloatInput, PhoneInput, Pick, Select, Wizard } from '@/components/ui';
 import { FORM } from '@/content/form';
-import { APP, ROUTES } from '@/content/site';
+import { INBOX, ROUTES } from '@/content/site';
 
 /**
  * Окно заявки — одно на весь сайт.
@@ -39,12 +39,13 @@ export function RequestProvider({ children }: { children: ReactNode }) {
   const show = useMemo(() => () => setOpen(true), []);
 
   function submit() {
-    /* Отправлять пока некуда: приёмник заявок появится вместе
-       с app.markethelp.ru. До запуска окно просто ведёт на страницу
-       «Заявка принята» — чтобы путь был виден целиком.
-       Перед запуском: отправить данные на app и открывать «спасибо»
-       только после удачного ответа, а на неудачу показывать тост. */
-    if (!APP.ready) {
+    /* Отправлять пока некуда: приёмника заявок нет. До запуска окно
+       просто ведёт на страницу «Заявка принята» — чтобы путь был виден
+       целиком.
+       Перед запуском: отправить данные на приёмник и открывать
+       «спасибо» только после удачного ответа, а на неудачу
+       показывать тост. */
+    if (!INBOX.ready) {
       router.push(ROUTES.thanks);
       return;
     }

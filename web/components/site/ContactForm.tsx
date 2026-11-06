@@ -6,7 +6,7 @@ import { Rich } from '@/components/Rich';
 import { Button, Choice, FloatInput, FloatTextarea, PhoneInput } from '@/components/ui';
 import { CONTACT_FORM } from '@/content/contacts';
 import { FORM } from '@/content/form';
-import { APP, ROUTES } from '@/content/site';
+import { INBOX, ROUTES } from '@/content/site';
 
 /**
  * Форма обратной связи на странице контактов.
@@ -20,11 +20,11 @@ export function ContactForm() {
 
   function submit(e: FormEvent) {
     e.preventDefault();
-    /* Отправлять пока некуда: приёмник появится вместе
-       с app.markethelp.ru. До запуска форма ведёт на «Заявка принята».
-       Перед запуском: слать данные на app и открывать «спасибо» только
-       после удачного ответа, а на неудачу показывать тост. */
-    if (!APP.ready) router.push(ROUTES.thanks);
+    /* Отправлять пока некуда: приёмника заявок нет. До запуска форма
+       ведёт на «Заявка принята».
+       Перед запуском: слать данные на приёмник и открывать «спасибо»
+       только после удачного ответа, а на неудачу показывать тост. */
+    if (!INBOX.ready) router.push(ROUTES.thanks);
   }
 
   return (

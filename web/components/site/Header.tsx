@@ -62,11 +62,19 @@ export function Header() {
           </span>
 
           {/* Вход в кабинет — вторичное действие: основное на странице
-              одно, и это расчёт партии. Кнопка скрыта до запуска
-              app.markethelp.ru: вести её некуда. */}
+              одно, и это расчёт партии. Кабинет на своём поддомене,
+              поэтому новой вкладкой: в нём работают долго, и сайт
+              под рукой пригодится. Кнопка стоит в строке на всех
+              ширинах и потому не повторяется в меню: тому, кто пришёл
+              войти, не нужно его открывать. */}
           {APP.ready ? (
-            <a className="btn btn-sm shrink-0" href={APP.href}>
-              Личный кабинет
+            <a
+              className="btn btn-sm shrink-0"
+              href={APP.href}
+              target="_blank"
+              rel="noopener"
+            >
+              {APP.title}
             </a>
           ) : null}
 
@@ -105,11 +113,6 @@ export function Header() {
             {l.title}
           </LinkGo>
         ))}
-        {APP.ready ? (
-          <a className="btn btn-sm mt-2" href={APP.href}>
-            Личный кабинет
-          </a>
-        ) : null}
       </nav>
     </header>
   );
