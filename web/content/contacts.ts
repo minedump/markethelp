@@ -18,6 +18,7 @@ export type Contact = {
   note: string;
 };
 export type Requisite = { key: string; value: string };
+export type GalleryPhoto = { pic: string; alt: string };
 
 
 export const CONTACTS: Contact[] = typoDeep([
@@ -50,6 +51,17 @@ export const CONTACTS: Contact[] = typoDeep([
     note: 'без выходных; звонок вне рабочих часов принимает автоответчик — перезвоним утром',
   },
 ]);
+
+/**
+ * Фото склада на странице контактов: 36 кадров с приёмки, хранения
+ * и упаковки, обработанные скриптом photos/fulfilment.py. Файлы лежат
+ * в public/assets/fulfilment/01.jpg…36.jpg — порядковый номер в alt
+ * честный, своей подписи у кадра нет.
+ */
+export const CONTACT_GALLERY: GalleryPhoto[] = Array.from({ length: 36 }, (_, i) => ({
+  pic: `fulfilment/${String(i + 1).padStart(2, '0')}`,
+  alt: `Склад MarketHelp: приёмка, хранение и упаковка — фото ${i + 1} из 36`,
+}));
 
 export const REQUISITES: Requisite[] = typoDeep([
   {

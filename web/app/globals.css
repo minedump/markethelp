@@ -1077,6 +1077,25 @@
   /* 96 секунд на половину ряда — примерно 45 пикселей в секунду. */
   .marquee-row { @apply flex w-max items-center gap-10 pr-10; animation: marquee 96s linear infinite; }
 
+  /* ---------- ГАЛЕРЕЯ ФОТО: КОНТАКТЫ ---------- */
+
+  /* Слайдер фото склада на странице контактов. Тот же приём снэп-прокрутки,
+     что у .swipe из кита, но без перехода в сетку на широком экране:
+     три десятка фото сеткой растянули бы страницу вниз на несколько
+     экранов, а лентой они остаются обзором, который пролистывают, а не
+     читают подряд. */
+  .photo-gallery {
+    @apply flex gap-4 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 1rem;
+    scrollbar-width: none;
+  }
+  .photo-gallery::-webkit-scrollbar { display: none; }
+  .photo-gallery > * {
+    @apply shrink-0 w-[78%] sm:w-[22rem];
+    scroll-snap-align: start;
+  }
+
   /* ---------- ПРАВОВЫЕ СТРАНИЦЫ: содержание сбоку ---------- */
 
   /* Договор, оферта, политика: содержание стоит рядом с текстом и

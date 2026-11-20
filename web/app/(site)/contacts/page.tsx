@@ -4,8 +4,9 @@ import { LinkGo, Text } from '@/components/ui';
 import { Head, Section, TILE } from '@/components/site/Layout';
 import { ContactForm } from '@/components/site/ContactForm';
 import { PageHead } from '@/components/site/PageHead';
+import { PhotoGallery } from '@/components/site/PhotoGallery';
 import { OrganizationSchema } from '@/components/site/Schema';
-import { CONTACTS, CONTACT_FORM } from '@/content/contacts';
+import { CONTACTS, CONTACT_FORM, CONTACT_GALLERY } from '@/content/contacts';
 import { WAREHOUSE_SECTIONS } from '@/content/warehouse';
 import { PAGES } from '@/content/pages';
 import { ROUTES, WAREHOUSE } from '@/content/site';
@@ -53,6 +54,16 @@ export default function ContactsPage() {
               </div>
             </div>
           ))}
+        </div>
+      </Section>
+
+      {/* Фото склада: как выглядит приёмка, хранение и упаковка изнутри.
+          Лента, а не сетка — тридцать шесть кадров сеткой растянули бы
+          страницу на несколько экранов. */}
+      <Section>
+        <Head title="Склад изнутри" lead="Приёмка, хранение и упаковка — фото со склада в Москве." />
+        <div className="mt-9">
+          <PhotoGallery photos={CONTACT_GALLERY} />
         </div>
       </Section>
 

@@ -7,14 +7,19 @@ import { PostCard } from '@/components/site/PostCard';
 import { CheckList } from '@/components/site/PhotoBlock';
 import { ArticleSchema, BreadcrumbSchema } from '@/components/site/Schema';
 import { ARTICLES, BLOG_RUBRICS, BLOG_SECTIONS, POSTS } from '@/content/blog';
+import type { Article, Post } from '@/content/blog';
 import { ROUTES, asset } from '@/content/site';
 
 /**
  * Статья блога.
  *
- * Страницы собираются только для написанных статей: пустая страница
- * в поиске хуже, чем её отсутствие. Остальные записи видны в списке
- * карточками без ссылки.
+ * Блог временно скрыт с сайта: статика экспорта не даёт собрать
+ * динамический маршрут вовсе без путей (generateStaticParams с пустым
+ * массивом — ошибка сборки), поэтому страницы написанных статей
+ * по-прежнему собираются, но find() ниже всегда отдаёт null — для
+ * любого адреса срабатывает тот же `if (!found) notFound()`, что и
+ * раньше для ненаписанных статей. Вернуть блог — вернуть прежнее тело
+ * find(), закомментированное под текущим.
  *
  * Текст идёт во всю колонку, без оглавления сбоку: статья короткая,
  * и содержание в ней было бы длиннее самих разделов.
@@ -23,10 +28,12 @@ export function generateStaticParams() {
   return Object.keys(ARTICLES).map((slug) => ({ slug }));
 }
 
-function find(slug: string) {
-  const post = POSTS.find((p) => p.slug === slug);
-  const article = ARTICLES[slug];
-  return post && article ? { post, article } : null;
+function find(_slug: string): { post: Post; article: Article } | null {
+  return null;
+  // восстановление блога — вернуть:
+  // const post = POSTS.find((p) => p.slug === slug);
+  // const article = ARTICLES[slug];
+  // return post && article ? { post, article } : null;
 }
 
 /* В Next 15 адрес приходит обещанием — отсюда await и async у страницы */

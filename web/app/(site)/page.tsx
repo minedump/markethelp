@@ -4,11 +4,9 @@ import { Icon } from '@/components/Icon';
 import { Bento, Glow, LinkButton, LinkGo, Steps, Swipe, Tabs, Text } from '@/components/ui';
 import { Cta, Head, Section, TILE } from '@/components/site/Layout';
 import { Marquee } from '@/components/site/Marquee';
-import { PostCard } from '@/components/site/PostCard';
 import { RequestButton } from '@/components/site/RequestButton';
 import { OrganizationSchema } from '@/components/site/Schema';
 import { COMPARE, FACTS, NICHES, SERVICES, STEPS } from '@/content/home';
-import { POSTS } from '@/content/blog';
 import { CTA, PAGES } from '@/content/pages';
 import { ROUTES, asset } from '@/content/site';
 
@@ -185,24 +183,6 @@ export default function HomePage() {
               ))}
             </ul>
           </Bento>
-        </Swipe>
-      </Section>
-
-      {/* Блог — три последних статьи теми же карточками, что в блоге */}
-      <Section step="home" id="home-blog">
-        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
-          <Head
-            title="Блог MarketHelp"
-            lead="Разбираем работу с площадками, изменения в регламентах и кейсы клиентов — в блоге."
-          />
-          <LinkGo href={ROUTES.blog} arrow>
-            Все статьи
-          </LinkGo>
-        </div>
-        <Swipe cols="sm:grid-cols-2 lg:grid-cols-3" className="gap-x-6 gap-y-10 mt-9">
-          {POSTS.slice(0, 3).map((p) => (
-            <PostCard key={p.slug} post={p} />
-          ))}
         </Swipe>
       </Section>
 

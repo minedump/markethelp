@@ -170,7 +170,6 @@ export const FOOT_COLUMNS: { title: string; links: NavLink[] }[] = typoDeep([
       { title: 'О компании', href: ROUTES.about },
       { title: 'Как начать работать', href: ROUTES.start },
       { title: 'Условия работы', href: ROUTES.terms },
-      { title: 'Блог', href: ROUTES.blog },
       { title: 'Контакты', href: ROUTES.contacts },
       { title: APP.title, href: APP.href, external: true },
     ],

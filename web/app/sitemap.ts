@@ -1,5 +1,4 @@
 import type { MetadataRoute } from 'next';
-import { ARTICLES, POSTS } from '@/content/blog';
 import { PAGES } from '@/content/pages';
 import { ROUTES, SITE_URL } from '@/content/site';
 
@@ -9,7 +8,8 @@ import { ROUTES, SITE_URL } from '@/content/site';
  * нельзя.
  *
  * В карту не идут «Заявка принята» и 404: первая — страница-цель
- * после формы, вторая не страница вовсе.
+ * после формы, вторая не страница вовсе. Блог скрыт с сайта — его тоже
+ * нет: страницы отдают notFound(), в карте им делать нечего.
  *
  * priority не выдумываем по ощущениям: главная выше остальных, прочее
  * равно между собой. Поисковики давно считают этот вес сами, и
@@ -34,18 +34,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ROUTES.contacts,
     ROUTES.documents,
     ROUTES.requisites,
-    ROUTES.blog,
     ROUTES.policy,
     ROUTES.consent,
     ROUTES.offer,
   ];
 
-  /* в карту идут только написанные статьи: страниц у остальных нет */
-  const posts = POSTS.filter((p) => p.slug in ARTICLES).map((p) => `${ROUTES.blog}${p.slug}/`);
-
-  return [...pages, ...posts].map((path) => ({
+  return pages.map((path) => ({
     url: url(path),
-    changeFrequency: path === ROUTES.blog || path === ROUTES.home ? 'weekly' : 'monthly',
+    changeFrequency: path === ROUTES.home ? 'weekly' : 'monthly',
     priority: path === PAGES.home.href ? 1 : 0.7,
   }));
 }
